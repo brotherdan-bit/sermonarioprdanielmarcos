@@ -234,6 +234,52 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
 .cfg-status{font-size:11px;padding:5px 8px;border-radius:5px;margin-top:6px;}
 .cfg-status.ok{background:var(--gn2);color:var(--gn);border:1px solid rgba(26,158,92,.2);}
 .cfg-status.no{background:var(--rd2);color:var(--rd);border:1px solid rgba(192,57,43,.2);}
+/* LISTA */
+.lst-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--bd);}
+.lst-tools input{flex:1;min-width:150px;padding:7px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;font-size:13px;color:var(--tx);outline:none;}
+.lst-tools input:focus{border-color:var(--ac);}
+.lst-box{max-height:60vh;overflow:auto;border:1px solid var(--bd);border-radius:8px;}
+.lst{width:100%;border-collapse:collapse;font-size:12px;}
+.lst thead th{position:sticky;top:0;background:var(--sf2);z-index:1;text-align:left;padding:9px 10px;border-bottom:2px solid var(--bd);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);cursor:pointer;user-select:none;white-space:nowrap;}
+.lst thead th:hover{background:var(--sf3);color:var(--ac);}
+.lst thead th .sort-ind{font-size:9px;opacity:.5;margin-left:3px;}
+.lst thead th.sorted .sort-ind{opacity:1;color:var(--ac);}
+.lst tbody tr{border-bottom:1px solid var(--bd2);cursor:pointer;transition:background .12s;}
+.lst tbody tr:hover{background:var(--sf2);}
+.lst tbody td{padding:8px 10px;color:var(--tx2);vertical-align:top;}
+.lst tbody td.c-title{color:var(--tx);font-weight:600;}
+.lst tbody td.c-ref{color:var(--ac);font-style:italic;}
+.lst tbody td.c-type{white-space:nowrap;}
+.lst tbody td.c-theme{color:var(--tx3);}
+.lst tbody td.c-date{white-space:nowrap;color:var(--tx4);font-size:11px;}
+.lst tbody td.c-min{text-align:center;font-weight:700;color:var(--ac);}
+.lst-num{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:12px;background:var(--sf3);color:var(--tx4);font-size:10px;font-weight:700;margin-right:6px;}
+.lst-info{font-size:11px;color:var(--tx4);padding:8px 0 0;text-align:center;}
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px;}
+.dash-card{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:14px;}
+.dash-card h3{font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.dash-big{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.dash-kpi{background:linear-gradient(135deg,var(--ox),var(--oxm));color:#fff;border-radius:10px;padding:14px;text-align:center;}
+.dash-kpi-v{font-size:28px;font-weight:700;color:#a8c8f0;line-height:1.1;}
+.dash-kpi-l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:3px;}
+.dash-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;}
+.dash-bar-l{min-width:100px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dash-bar-w{flex:1;background:var(--bg);border-radius:10px;height:18px;position:relative;overflow:hidden;border:1px solid var(--bd2);}
+.dash-bar-f{position:absolute;top:0;left:0;height:100%;border-radius:10px;transition:width .4s;}
+.dash-bar-n{min-width:32px;text-align:right;color:var(--tx3);font-weight:700;font-size:11px;}
+.dash-empty{text-align:center;padding:30px;color:var(--tx4);font-size:13px;font-style:italic;}
+.dash-chart{position:relative;min-height:180px;}
+.dash-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:11px;color:var(--tx3);}
+.dash-legend-i{display:flex;align-items:center;gap:5px;}
+.dash-legend-sw{width:10px;height:10px;border-radius:2px;display:inline-block;}
+.dash-scroll{max-height:220px;overflow-y:auto;padding-right:4px;}
+@media(max-width:600px){
+  .dash-big{grid-template-columns:repeat(2,1fr);}
+  .dash-kpi-v{font-size:22px;}
+  .lst tbody td.c-theme,.lst tbody td.c-date{display:none;}
+  .lst thead th.h-theme,.lst thead th.h-date{display:none;}
+}
 /* TOAST */
 .toast{position:fixed;bottom:18px;right:18px;background:var(--ox);color:#fff;padding:9px 14px;border-radius:9px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999;box-shadow:0 6px 20px rgba(0,33,71,.25);border-left:3px solid #7aa5e0;max-width:260px;}
 .toast.show{opacity:1;transform:none;}
@@ -312,6 +358,8 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   <div class="sep"></div>
   <button class="btn btn-blue" onclick="openEdit()" title="Novo sermão (N)">＋ Novo</button>
   <button class="btn btn-dark" onclick="openBible()" title="Bíblia (B)">📖 Bíblia</button>
+  <button class="btn btn-ghost" onclick="openList()" title="Lista de sermões (L)">📋 Lista</button>
+  <button class="btn btn-ghost" onclick="openDashboard()" title="Dashboard (D)">📊 Dashboard</button>
   <button class="btn btn-ghost" onclick="doBackup()" title="Baixar backup">↓ Backup</button>
   <label class="btn btn-ghost" style="cursor:pointer" title="Importar backup">↑ Importar<input type="file" accept=".json,application/json" style="display:none" onchange="openImport(event)"></label>
   <button class="btn btn-ghost" id="btnSyncDrive" onclick="syncMenu('drive')" title="Sincronizar com Google Drive">📁 Drive</button>
@@ -585,6 +633,85 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
 <!-- POPUP MENU SYNC -->
 <div class="syncpop" id="syncPop" role="menu"></div>
 
+<!-- MODAL: LISTA DE SERMÕES -->
+<div class="ov" id="mList" role="dialog" aria-modal="true"><div class="modal" style="max-width:1000px">
+  <button class="mx" onclick="closeM('mList')" aria-label="Fechar">✕</button>
+  <div class="mtitle">📋 Lista de Sermões</div>
+  <div class="lst-tools">
+    <input id="lstSrch" placeholder="🔍 Buscar na lista…" oninput="renderList()" autocomplete="off">
+    <select id="lstFtype" onchange="renderList()">
+      <option value="">Todos os tipos</option>
+      <option>Expositivo</option><option>Temático</option><option>Textual</option>
+      <option>Evangelístico</option><option>Edificação</option><option>Palestra</option>
+    </select>
+    <button class="btn btn-ghost" onclick="exportCSV()" title="Exportar CSV">📄 CSV</button>
+    <button class="btn btn-ghost" onclick="exportXLSX()" title="Exportar Excel (.xlsx)">📊 Excel</button>
+    <button class="btn btn-ghost" onclick="printList()" title="Imprimir lista">🖨️ Imprimir</button>
+  </div>
+  <div class="lst-box">
+    <table class="lst" id="lstTable">
+      <thead><tr>
+        <th data-sort="idx" style="width:50px">#</th>
+        <th data-sort="title" class="h-title">Título</th>
+        <th data-sort="ref" class="h-ref">Texto Bíblico</th>
+        <th data-sort="type" class="h-type">Tipo</th>
+        <th data-sort="theme" class="h-theme">Tema</th>
+        <th data-sort="date" class="h-date">Data</th>
+        <th data-sort="m" style="width:70px" class="h-min">Minist.</th>
+      </tr></thead>
+      <tbody id="lstBody"></tbody>
+    </table>
+  </div>
+  <div class="lst-info" id="lstInfo"></div>
+  <div class="mfoot">
+    <button class="btn btn-ghost" onclick="closeM('mList')">Fechar</button>
+  </div>
+</div></div>
+
+<!-- MODAL: DASHBOARD -->
+<div class="ov" id="mDash" role="dialog" aria-modal="true"><div class="modal" style="max-width:900px">
+  <button class="mx" onclick="closeM('mDash')" aria-label="Fechar">✕</button>
+  <div class="mtitle">📊 Dashboard</div>
+
+  <div class="dash-big">
+    <div class="dash-kpi"><div class="dash-kpi-v" id="dashTotal">0</div><div class="dash-kpi-l">Sermões</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-v" id="dashMin">0</div><div class="dash-kpi-l">Ministrações</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-v" id="dashThemes">0</div><div class="dash-kpi-l">Temas</div></div>
+    <div class="dash-kpi"><div class="dash-kpi-v" id="dashAvg">0</div><div class="dash-kpi-l">Média por Sermão</div></div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="dash-card">
+      <h3>📚 Por Tipo</h3>
+      <div class="dash-chart" id="chartType"></div>
+    </div>
+    <div class="dash-card">
+      <h3>🏷️ Por Tema (top 10)</h3>
+      <div class="dash-chart dash-scroll" id="chartTheme"></div>
+    </div>
+  </div>
+
+  <div class="dash-card" style="margin-bottom:12px">
+    <h3>📅 Ministrações ao longo do tempo</h3>
+    <div class="dash-chart" id="chartTime"></div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="dash-card">
+      <h3>🏆 Top 10 mais ministrados</h3>
+      <div class="dash-chart dash-scroll" id="chartTop"></div>
+    </div>
+    <div class="dash-card">
+      <h3>📖 Livros bíblicos mais usados</h3>
+      <div class="dash-chart dash-scroll" id="chartBooks"></div>
+    </div>
+  </div>
+
+  <div class="mfoot">
+    <button class="btn btn-ghost" onclick="closeM('mDash')">Fechar</button>
+  </div>
+</div></div>
+
 <!-- MODAL: AJUDA -->
 <div class="ov" id="mHelp" role="dialog" aria-modal="true"><div class="modal" style="max-width:520px">
   <button class="mx" onclick="closeM('mHelp')" aria-label="Fechar">✕</button>
@@ -594,6 +721,8 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
     <span class="kbd">/</span><span>Focar no campo de busca</span>
     <span class="kbd">N</span><span>Novo sermão</span>
     <span class="kbd">B</span><span>Abrir Bíblia</span>
+    <span class="kbd">L</span><span>Lista de sermões</span>
+    <span class="kbd">D</span><span>Dashboard</span>
     <span class="kbd">Esc</span><span>Fechar modais e popups</span>
     <span class="kbd">Ctrl</span>+<span class="kbd">S</span><span>Salvar (dentro da edição)</span>
     <span class="kbd">?</span><span>Esta ajuda</span>
@@ -602,7 +731,7 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   <div style="font-size:13px;color:var(--tx2);line-height:1.7">
     <p><b>Sermonário</b> é um organizador de sermões com busca, filtros, ministrações, exportação (PDF/Word) e consulta bíblica offline + online.</p>
     <p style="margin-top:8px">Os dados ficam salvos <b>localmente</b> no seu navegador. Faça <b>backup</b> regularmente (botão ↓ Backup) ou ative sync com Drive/OneDrive em ⚙ Configurações.</p>
-    <p style="margin-top:8px;font-size:11px;color:var(--tx4);">Versão 9 · Abril 2026</p>
+    <p style="margin-top:8px;font-size:11px;color:var(--tx4);">Versão 10 · Abril 2026</p>
   </div>
   <div class="mfoot">
     <button class="btn btn-blue" onclick="closeM('mHelp')">Entendi</button>
@@ -1900,6 +2029,10 @@ document.addEventListener('keydown', e => {
     if(!document.querySelector('.ov.open')){ e.preventDefault(); openEdit(); }
   }else if(e.key === 'b' || e.key === 'B'){
     if(!document.querySelector('.ov.open')){ e.preventDefault(); openBible(); }
+  }else if(e.key === 'l' || e.key === 'L'){
+    if(!document.querySelector('.ov.open')){ e.preventDefault(); openList(); }
+  }else if(e.key === 'd' || e.key === 'D'){
+    if(!document.querySelector('.ov.open')){ e.preventDefault(); openDashboard(); }
   }else if(e.key === '?'){
     e.preventDefault();
     openM('mHelp');
@@ -2408,6 +2541,514 @@ function saveCfg(){
   updateSyncButtons();
   closeM('mCfg');
   toast('Configurações salvas','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── LISTA DE SERMÕES ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+let lstSort = 'idx';
+let lstSortDir = 'asc';
+
+function openList(){
+  openM('mList');
+  // Reset
+  document.getElementById('lstSrch').value = '';
+  document.getElementById('lstFtype').value = '';
+  lstSort = 'idx';
+  lstSortDir = 'asc';
+  renderList();
+
+  // Configurar handlers dos cabeçalhos (uma vez)
+  const table = document.getElementById('lstTable');
+  if(!table.dataset.bound){
+    table.querySelectorAll('thead th').forEach(th => {
+      th.onclick = () => {
+        const k = th.dataset.sort;
+        if(lstSort === k) lstSortDir = lstSortDir === 'asc' ? 'desc' : 'asc';
+        else { lstSort = k; lstSortDir = 'asc'; }
+        renderList();
+      };
+    });
+    table.dataset.bound = '1';
+  }
+}
+
+function getListData(){
+  const q = (document.getElementById('lstSrch')?.value || '').toLowerCase().trim();
+  const fty = document.getElementById('lstFtype')?.value || '';
+  let rows = SS.map((s, i) => ({
+    idx: i + 1,
+    id: s.id,
+    title: s.title || '',
+    ref: s.ref || '',
+    type: s.type || '',
+    theme: s.theme || '',
+    date: s.date || '',
+    m: s.m || 0
+  }));
+  if(q){
+    rows = rows.filter(r =>
+      r.title.toLowerCase().includes(q) ||
+      r.ref.toLowerCase().includes(q) ||
+      r.theme.toLowerCase().includes(q) ||
+      r.type.toLowerCase().includes(q)
+    );
+  }
+  if(fty) rows = rows.filter(r => r.type === fty);
+  return rows;
+}
+
+function sortListData(rows){
+  const k = lstSort, dir = lstSortDir === 'asc' ? 1 : -1;
+  const coll = new Intl.Collator('pt-BR', {sensitivity:'base'});
+  rows.sort((a,b) => {
+    const av = a[k], bv = b[k];
+    if(k === 'idx' || k === 'm') return (av - bv) * dir;
+    if(k === 'date'){
+      const ax = av || '9999', bx = bv || '9999';
+      return ax.localeCompare(bx) * dir;
+    }
+    return coll.compare(String(av), String(bv)) * dir;
+  });
+  return rows;
+}
+
+function renderList(){
+  const rows = sortListData(getListData());
+  const body = document.getElementById('lstBody');
+
+  // Indicador de sort no cabeçalho
+  document.querySelectorAll('#lstTable thead th').forEach(th => {
+    th.classList.remove('sorted');
+    const ind = th.querySelector('.sort-ind');
+    if(ind) ind.remove();
+    if(th.dataset.sort === lstSort){
+      th.classList.add('sorted');
+      const s = document.createElement('span');
+      s.className = 'sort-ind';
+      s.textContent = lstSortDir === 'asc' ? '▲' : '▼';
+      th.appendChild(s);
+    }
+  });
+
+  if(!rows.length){
+    body.innerHTML = '<tr><td colspan="7" style="padding:30px;text-align:center;color:var(--tx4);font-style:italic">Nenhum sermão encontrado</td></tr>';
+    document.getElementById('lstInfo').textContent = '0 sermões';
+    return;
+  }
+
+  body.innerHTML = rows.map(r => {
+    const dt = r.date ? new Date(r.date + 'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+    const bc = BCLASS[r.type || 'Expositivo'] || 'bEx';
+    return `<tr onclick="closeM('mList');openView('${esc(r.id)}')">
+      <td><span class="lst-num">${String(r.idx).padStart(3,'0')}</span></td>
+      <td class="c-title">${esc(r.title)}</td>
+      <td class="c-ref">${esc(r.ref)}</td>
+      <td class="c-type"><span class="badge ${bc}">${esc(r.type)}</span></td>
+      <td class="c-theme">${esc(r.theme || '—')}</td>
+      <td class="c-date">${dt}</td>
+      <td class="c-min">${r.m}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('lstInfo').textContent =
+    `${rows.length} ${rows.length === 1 ? 'sermão exibido' : 'sermões exibidos'} · clique numa linha para abrir · clique no cabeçalho para ordenar`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── EXPORTAÇÃO CSV ────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+function csvEscape(v){
+  const s = String(v == null ? '' : v);
+  if(/[",;\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+function exportCSV(){
+  const rows = sortListData(getListData());
+  if(!rows.length){ toast('Nada para exportar.','err'); return; }
+  // Separador ; para compatibilidade com Excel brasileiro
+  const header = ['#','Título','Texto Bíblico','Tipo','Tema','Data','Ministrações'];
+  const lines = [header.map(csvEscape).join(';')];
+  rows.forEach(r => {
+    const dt = r.date ? new Date(r.date + 'T12:00:00').toLocaleDateString('pt-BR') : '';
+    lines.push([r.idx, r.title, r.ref, r.type, r.theme, dt, r.m].map(csvEscape).join(';'));
+  });
+  // BOM para UTF-8 ser reconhecido pelo Excel
+  const csv = '\uFEFF' + lines.join('\r\n');
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'sermonario_lista_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  toast('✓ CSV exportado (' + rows.length + ' sermões)','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── EXPORTAÇÃO EXCEL (lazy-load SheetJS) ──────────────────────
+// ═══════════════════════════════════════════════════════════════
+let xlsxLoaded = false;
+async function loadXLSX(){
+  if(xlsxLoaded || typeof XLSX !== 'undefined') { xlsxLoaded = true; return; }
+  await loadScriptOnce('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+  xlsxLoaded = true;
+}
+
+async function exportXLSX(){
+  const rows = sortListData(getListData());
+  if(!rows.length){ toast('Nada para exportar.','err'); return; }
+  toast('Carregando biblioteca Excel…');
+  try{
+    await loadXLSX();
+  }catch(e){
+    toast('Sem internet. Use CSV.','err');
+    return;
+  }
+
+  // Dados para planilha
+  const data = rows.map(r => ({
+    '#': r.idx,
+    'Título': r.title,
+    'Texto Bíblico': r.ref,
+    'Tipo': r.type,
+    'Tema': r.theme,
+    'Data': r.date ? new Date(r.date + 'T12:00:00').toLocaleDateString('pt-BR') : '',
+    'Ministrações': r.m
+  }));
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data);
+
+  // Largura de colunas
+  ws['!cols'] = [
+    {wch: 5},    // #
+    {wch: 45},   // Título
+    {wch: 30},   // Texto
+    {wch: 14},   // Tipo
+    {wch: 22},   // Tema
+    {wch: 12},   // Data
+    {wch: 12}    // Min
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Lista');
+
+  // Segunda aba: estatísticas
+  const stats = computeStats();
+  const statsData = [
+    ['Métrica','Valor'],
+    ['Total de sermões', stats.total],
+    ['Total de ministrações', stats.totalMin],
+    ['Temas únicos', stats.themes.size],
+    ['Média de ministrações por sermão', stats.avgMin],
+    ['Sermão mais ministrado', stats.topMin ? `${stats.topMin.title} (${stats.topMin.m}x)` : '—'],
+    [],
+    ['Por tipo','Quantidade'],
+    ...Object.entries(stats.byType).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k,v]),
+    [],
+    ['Por tema','Quantidade'],
+    ...[...stats.byTheme.entries()].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([k,v])=>[k,v]),
+    [],
+    ['Livros bíblicos mais usados',''],
+    ...[...stats.byBook.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15).map(([k,v])=>[k,v])
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(statsData);
+  ws2['!cols'] = [{wch: 40}, {wch: 15}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Estatísticas');
+
+  const fn = 'sermonario_lista_' + new Date().toISOString().split('T')[0] + '.xlsx';
+  XLSX.writeFile(wb, fn);
+  toast('✓ Excel exportado (' + rows.length + ' sermões + aba de estatísticas)','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── IMPRIMIR LISTA ────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+function printList(){
+  const rows = sortListData(getListData());
+  if(!rows.length){ toast('Nada para imprimir.','err'); return; }
+  const w = window.open('', '_blank', 'width=900,height=700');
+  if(!w){ toast('Bloqueador de pop-ups impediu.','err'); return; }
+  const body = rows.map(r => {
+    const dt = r.date ? new Date(r.date + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+    return `<tr>
+      <td>${r.idx}</td>
+      <td><b>${esc(r.title)}</b></td>
+      <td><i>${esc(r.ref)}</i></td>
+      <td>${esc(r.type)}</td>
+      <td>${esc(r.theme)}</td>
+      <td>${dt}</td>
+      <td style="text-align:center">${r.m}</td>
+    </tr>`;
+  }).join('');
+  const today = new Date().toLocaleDateString('pt-BR');
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Lista de Sermões</title>
+<style>
+body{font-family:Tahoma,sans-serif;padding:2cm;max-width:none;color:#333;font-size:11pt}
+h1{color:#002147;font-family:Georgia,serif;margin-bottom:4px}
+.sub{color:#666;font-size:10pt;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:9pt}
+thead th{background:#002147;color:#fff;padding:6px 8px;text-align:left;font-size:8pt;text-transform:uppercase;letter-spacing:.05em}
+tbody tr{border-bottom:1px solid #ddd}
+tbody tr:nth-child(even){background:#f7f9fc}
+tbody td{padding:5px 8px;vertical-align:top}
+.ftr{margin-top:20px;text-align:center;font-size:8pt;color:#999;border-top:1px solid #ddd;padding-top:10px}
+@media print{body{padding:1.5cm}}
+</style></head><body>
+<h1>Sermonário — Lista de Sermões</h1>
+<div class="sub">Pr. Daniel Marcos Ferreira · AD Belém · Setor 68 · Jandira-SP<br>Impresso em ${today} · ${rows.length} sermões</div>
+<table>
+<thead><tr><th>#</th><th>Título</th><th>Texto</th><th>Tipo</th><th>Tema</th><th>Data</th><th>Min.</th></tr></thead>
+<tbody>${body}</tbody>
+</table>
+<div class="ftr">Sermonário — Pr. Daniel Marcos</div>
+<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>
+</body></html>`);
+  w.document.close();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── DASHBOARD ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+function computeStats(){
+  const total = SS.length;
+  const totalMin = SS.reduce((a, s) => a + (s.m || 0), 0);
+  const themes = new Set(SS.map(s => s.theme).filter(Boolean));
+
+  // Por tipo
+  const byType = {};
+  SS.forEach(s => {
+    const t = s.type || 'Sem tipo';
+    byType[t] = (byType[t] || 0) + 1;
+  });
+
+  // Por tema
+  const byTheme = new Map();
+  SS.forEach(s => {
+    if(!s.theme) return;
+    byTheme.set(s.theme, (byTheme.get(s.theme) || 0) + 1);
+  });
+
+  // Top 10 mais ministrados
+  const topList = [...SS].sort((a,b)=>(b.m||0)-(a.m||0)).slice(0,10).filter(s => (s.m||0) > 0);
+  const topMin = topList[0];
+
+  // Por livro bíblico (extrai o primeiro livro de cada referência)
+  const byBook = new Map();
+  SS.forEach(s => {
+    if(!s.ref) return;
+    // Extrai o nome do livro (abreviação ou nome completo)
+    const m = s.ref.match(/^\s*(\d?\s*[A-Za-zÀ-ÿ]+)/);
+    if(m){
+      const book = m[1].trim();
+      byBook.set(book, (byBook.get(book) || 0) + 1);
+    }
+  });
+
+  // Ministrações ao longo do tempo (por ano-mês)
+  const byMonth = new Map();
+  SS.forEach(s => {
+    if(!Array.isArray(s.log)) return;
+    s.log.forEach(entry => {
+      // entry é string tipo "17 de abril de 2026"
+      const parsed = parseBrDate(entry);
+      if(parsed){
+        const key = parsed.y + '-' + String(parsed.m).padStart(2,'0');
+        byMonth.set(key, (byMonth.get(key) || 0) + 1);
+      }
+    });
+  });
+
+  const avgMin = total > 0 ? (totalMin / total).toFixed(1) : '0';
+
+  return {total, totalMin, themes, byType, byTheme, topList, topMin, byBook, byMonth, avgMin};
+}
+
+function parseBrDate(s){
+  // Formato: "17 de abril de 2026"
+  if(!s) return null;
+  const meses = {'janeiro':1,'fevereiro':2,'março':3,'marco':3,'abril':4,'maio':5,'junho':6,'julho':7,'agosto':8,'setembro':9,'outubro':10,'novembro':11,'dezembro':12};
+  // Regex aceita letras com acento (ç, ã, etc) no nome do mês
+  const m = s.toLowerCase().match(/(\d{1,2})\s+de\s+([a-zç\u00c0-\u017f]+)\s+de\s+(\d{4})/i);
+  if(!m) return null;
+  const mesName = m[2].normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const mes = meses[m[2]] || meses[mesName];
+  if(!mes) return null;
+  return {d: +m[1], m: mes, y: +m[3]};
+}
+
+function openDashboard(){
+  openM('mDash');
+  setTimeout(renderDashboard, 50); // aguarda abrir pra medir largura
+}
+
+function renderDashboard(){
+  const s = computeStats();
+
+  // KPIs
+  document.getElementById('dashTotal').textContent = s.total;
+  document.getElementById('dashMin').textContent = s.totalMin;
+  document.getElementById('dashThemes').textContent = s.themes.size;
+  document.getElementById('dashAvg').textContent = s.avgMin;
+
+  // Gráfico de tipos (donut + legenda)
+  renderTypeChart(s.byType);
+
+  // Gráfico de temas (barras horizontais)
+  renderBarChart('chartTheme', [...s.byTheme.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10), s.total);
+
+  // Gráfico de tempo (linha)
+  renderTimeChart(s.byMonth);
+
+  // Top ministrados
+  renderTopList(s.topList);
+
+  // Livros
+  renderBarChart('chartBooks', [...s.byBook.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12), s.total);
+}
+
+function renderTypeChart(byType){
+  const box = document.getElementById('chartType');
+  const entries = Object.entries(byType).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length){ box.innerHTML = '<div class="dash-empty">Sem dados</div>'; return; }
+  const total = entries.reduce((a,[,v])=>a+v,0);
+  // Cores = STRIPE dos tipos
+  const colors = entries.map(([t]) => STRIPE[t] || '#8aa5c0');
+
+  // SVG donut
+  const cx = 80, cy = 80, r = 60, rInner = 38;
+  let accum = 0;
+  const paths = entries.map(([label, val], i) => {
+    const frac = val / total;
+    const startAngle = accum * 2 * Math.PI - Math.PI/2;
+    accum += frac;
+    const endAngle = accum * 2 * Math.PI - Math.PI/2;
+    // Ponto start/end externo
+    const x1 = cx + r * Math.cos(startAngle);
+    const y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle);
+    const y2 = cy + r * Math.sin(endAngle);
+    // Ponto start/end interno
+    const xi1 = cx + rInner * Math.cos(startAngle);
+    const yi1 = cy + rInner * Math.sin(startAngle);
+    const xi2 = cx + rInner * Math.cos(endAngle);
+    const yi2 = cy + rInner * Math.sin(endAngle);
+    const large = frac > 0.5 ? 1 : 0;
+    // Se tem uma única fatia (100%), desenha círculo completo
+    if(entries.length === 1){
+      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${colors[i]}" />
+              <circle cx="${cx}" cy="${cy}" r="${rInner}" fill="var(--sf2)" />`;
+    }
+    return `<path d="M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${xi2} ${yi2} A ${rInner} ${rInner} 0 ${large} 0 ${xi1} ${yi1} Z" fill="${colors[i]}" />`;
+  }).join('');
+
+  const legend = entries.map(([label, val], i) =>
+    `<div class="dash-legend-i"><span class="dash-legend-sw" style="background:${colors[i]}"></span>${esc(label)} · <b>${val}</b> (${((val/total)*100).toFixed(0)}%)</div>`
+  ).join('');
+
+  box.innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <svg viewBox="0 0 160 160" width="140" height="140" style="flex-shrink:0">${paths}
+        <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="24" font-weight="700" fill="var(--tx)">${total}</text>
+        <text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9" fill="var(--tx4)">TOTAL</text>
+      </svg>
+      <div class="dash-legend" style="flex:1;min-width:120px">${legend}</div>
+    </div>`;
+}
+
+function renderBarChart(targetId, entries, total){
+  const box = document.getElementById(targetId);
+  if(!entries.length){ box.innerHTML = '<div class="dash-empty">Sem dados</div>'; return; }
+  const max = Math.max(...entries.map(e=>e[1]));
+  const palette = ['#1e6bbf','#6c3fc5','#1a9e5c','#d4860a','#c0392b','#0e7a8a','#8a3ca8','#1a7a48','#2d80d8','#b8660a'];
+  box.innerHTML = entries.map(([label, val], i) => {
+    const pct = (val / max) * 100;
+    const color = palette[i % palette.length];
+    return `<div class="dash-bar">
+      <div class="dash-bar-l" title="${esc(label)}">${esc(label)}</div>
+      <div class="dash-bar-w"><div class="dash-bar-f" style="width:${pct}%;background:${color}"></div></div>
+      <div class="dash-bar-n">${val}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTopList(topList){
+  const box = document.getElementById('chartTop');
+  if(!topList.length){ box.innerHTML = '<div class="dash-empty">Ainda não há ministrações registradas</div>'; return; }
+  box.innerHTML = topList.map((s,i) => `
+    <div class="dash-bar" onclick="closeM('mDash');setTimeout(()=>openView('${esc(s.id)}'),200)" style="cursor:pointer" title="Abrir sermão">
+      <div class="dash-bar-l"><b style="color:var(--ac);margin-right:4px">${i+1}.</b>${esc(s.title)}</div>
+      <div class="dash-bar-n">${s.m}×</div>
+    </div>`).join('');
+}
+
+function renderTimeChart(byMonth){
+  const box = document.getElementById('chartTime');
+  if(!byMonth.size){
+    box.innerHTML = '<div class="dash-empty">Registre ministrações com "＋ Hoje" para ver aqui</div>';
+    return;
+  }
+  // Ordenar por ano-mês crescente
+  const sorted = [...byMonth.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+  // Preencher meses faltantes entre o mais antigo e o mais recente (visual melhor)
+  const filled = [];
+  const first = sorted[0][0].split('-').map(Number);
+  const last = sorted[sorted.length-1][0].split('-').map(Number);
+  let y = first[0], m = first[1];
+  const map = new Map(sorted);
+  while(y < last[0] || (y === last[0] && m <= last[1])){
+    const key = y + '-' + String(m).padStart(2,'0');
+    filled.push([key, map.get(key) || 0]);
+    m++;
+    if(m > 12){ m = 1; y++; }
+    if(filled.length > 120) break; // safety
+  }
+
+  const w = Math.max(400, Math.min(600, filled.length * 40));
+  const h = 160, pad = {t:20, r:20, b:40, l:35};
+  const cw = w - pad.l - pad.r;
+  const ch = h - pad.t - pad.b;
+  const maxV = Math.max(1, ...filled.map(([,v])=>v));
+
+  // Barras
+  const bw = cw / filled.length * 0.7;
+  const bgap = cw / filled.length * 0.3;
+  const bars = filled.map(([k, v], i) => {
+    const x = pad.l + i * (cw / filled.length) + bgap/2;
+    const bh = v === 0 ? 0 : Math.max(2, (v / maxV) * ch);
+    const y = pad.t + ch - bh;
+    return `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="var(--ac)" rx="2">
+      <title>${k}: ${v} ministração${v!==1?'ões':''}</title></rect>`;
+  }).join('');
+
+  // Eixo Y
+  const ySteps = [0, Math.ceil(maxV/2), maxV];
+  const yLabels = ySteps.map(v => {
+    const y = pad.t + ch - (v/maxV) * ch;
+    return `<text x="${pad.l - 6}" y="${y + 3}" font-size="9" fill="var(--tx4)" text-anchor="end">${v}</text>
+            <line x1="${pad.l}" y1="${y}" x2="${w - pad.r}" y2="${y}" stroke="var(--bd2)" stroke-dasharray="2,3"/>`;
+  }).join('');
+
+  // Labels X (mostrar só alguns para não ficar ilegível)
+  const step = Math.max(1, Math.floor(filled.length / 6));
+  const mesesPt = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const xLabels = filled.map(([k], i) => {
+    if(i % step !== 0 && i !== filled.length - 1) return '';
+    const [y, m] = k.split('-');
+    const label = mesesPt[+m - 1] + '/' + y.slice(2);
+    const x = pad.l + i * (cw / filled.length) + bw/2 + bgap/2;
+    return `<text x="${x}" y="${h - pad.b + 14}" font-size="9" fill="var(--tx3)" text-anchor="middle">${label}</text>`;
+  }).join('');
+
+  const total = filled.reduce((a,[,v])=>a+v,0);
+
+  box.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px;display:block">
+      ${yLabels}
+      ${bars}
+      ${xLabels}
+    </svg>
+    <div style="font-size:10px;color:var(--tx4);text-align:center;margin-top:4px">${total} ministração${total!==1?'ões':''} registrada${total!==1?'s':''} em ${filled.length} ${filled.length!==1?'meses':'mês'}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
