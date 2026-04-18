@@ -201,6 +201,39 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
 .imp-opts label input{margin-top:3px;}
 .imp-opts .ttl{font-weight:700;color:var(--tx);}
 .imp-opts .dsc{font-size:11px;color:var(--tx4);margin-top:2px;}
+/* BANNER DE BACKUP */
+.bbk{background:linear-gradient(135deg,var(--gd2),#fff8ee);border-bottom:2px solid var(--gd);padding:8px 24px;display:flex;align-items:center;gap:10px;font-size:13px;color:#7a4a00;}
+[data-theme="dark"] .bbk{background:linear-gradient(135deg,#3a2f1a,#2d2415);color:#e8a838;}
+.bbk-msg{flex:1;}
+.bbk-btn{background:var(--gd);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.bbk-btn:hover{opacity:.85;}
+.bbk-x{background:transparent;border:none;cursor:pointer;color:inherit;opacity:.6;font-size:14px;padding:0 4px;}
+.bbk-x:hover{opacity:1;}
+/* SYNC MENU (popup) */
+.syncpop{display:none;position:fixed;z-index:300;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:6px;box-shadow:var(--sh);min-width:240px;}
+.syncpop.open{display:block;}
+.syncpop-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--tx);background:transparent;border:none;width:100%;text-align:left;font-family:inherit;}
+.syncpop-item:hover{background:var(--sf2);}
+.syncpop-item:disabled{opacity:.4;cursor:not-allowed;}
+.syncpop-item .ic{font-size:16px;width:22px;text-align:center;}
+.syncpop-sep{height:1px;background:var(--bd);margin:4px 6px;}
+.syncpop-status{font-size:11px;color:var(--tx4);padding:6px 12px;border-top:1px solid var(--bd2);margin-top:4px;}
+/* SETTINGS MODAL */
+.cfg-section{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--bd2);}
+.cfg-section:last-child{border-bottom:none;}
+.cfg-section h3{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:13px;color:var(--tx2);}
+.cfg-row .desc{font-size:11px;color:var(--tx4);margin-top:2px;}
+.cfg-toggle{position:relative;width:44px;height:24px;background:var(--bd);border-radius:12px;cursor:pointer;transition:background .2s;flex-shrink:0;border:none;padding:0;}
+.cfg-toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.cfg-toggle.on{background:var(--gn);}
+.cfg-toggle.on::after{transform:translateX(20px);}
+.cfg-help{font-size:11px;background:var(--sf3);border:1px solid var(--bd2);border-radius:6px;padding:8px 10px;color:var(--tx3);line-height:1.5;margin-top:6px;}
+.cfg-help a{color:var(--ac);}
+.cfg-help code{font-family:ui-monospace,Consolas,monospace;background:var(--bg);padding:1px 5px;border-radius:3px;font-size:11px;}
+.cfg-status{font-size:11px;padding:5px 8px;border-radius:5px;margin-top:6px;}
+.cfg-status.ok{background:var(--gn2);color:var(--gn);border:1px solid rgba(26,158,92,.2);}
+.cfg-status.no{background:var(--rd2);color:var(--rd);border:1px solid rgba(192,57,43,.2);}
 /* TOAST */
 .toast{position:fixed;bottom:18px;right:18px;background:var(--ox);color:#fff;padding:9px 14px;border-radius:9px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999;box-shadow:0 6px 20px rgba(0,33,71,.25);border-left:3px solid #7aa5e0;max-width:260px;}
 .toast.show{opacity:1;transform:none;}
@@ -281,9 +314,19 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   <button class="btn btn-dark" onclick="openBible()" title="Bíblia (B)">📖 Bíblia</button>
   <button class="btn btn-ghost" onclick="doBackup()" title="Baixar backup">↓ Backup</button>
   <label class="btn btn-ghost" style="cursor:pointer" title="Importar backup">↑ Importar<input type="file" accept=".json,application/json" style="display:none" onchange="openImport(event)"></label>
+  <button class="btn btn-ghost" id="btnSyncDrive" onclick="syncMenu('drive')" title="Sincronizar com Google Drive">📁 Drive</button>
+  <button class="btn btn-ghost" id="btnSyncOD" onclick="syncMenu('onedrive')" title="Sincronizar com OneDrive">☁️ OneDrive</button>
   <button class="btn btn-ghost btn-icon" id="btnTheme" onclick="toggleTheme()" title="Alternar tema" aria-label="Alternar tema claro/escuro">🌙</button>
+  <button class="btn btn-ghost btn-icon" onclick="openSettings()" title="Configurações" aria-label="Configurações">⚙</button>
   <button class="btn btn-ghost btn-icon" onclick="openM('mHelp')" title="Ajuda (?)" aria-label="Ajuda">?</button>
 </div></div>
+
+<!-- BANNER DE LEMBRETE -->
+<div id="backupBanner" class="bbk" style="display:none">
+  <span class="bbk-msg"></span>
+  <button class="bbk-btn" onclick="doBackup()">↓ Backup agora</button>
+  <button class="bbk-x" onclick="document.getElementById('backupBanner').style.display='none'" aria-label="Dispensar">✕</button>
+</div>
 
 <!-- MAIN -->
 <div class="main">
@@ -445,6 +488,103 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   </div>
 </div></div>
 
+<!-- MODAL: CONFIGURAÇÕES (sync, auto-backup) -->
+<div class="ov" id="mCfg" role="dialog" aria-modal="true"><div class="modal" style="max-width:600px">
+  <button class="mx" onclick="closeM('mCfg')" aria-label="Fechar">✕</button>
+  <div class="mtitle">⚙ Configurações</div>
+
+  <div class="cfg-section">
+    <h3>💾 Auto-backup local</h3>
+    <div class="cfg-row">
+      <div>
+        <div>Baixar JSON automaticamente a cada alteração</div>
+        <div class="desc">Garante que você sempre tenha uma cópia recente na pasta Downloads</div>
+      </div>
+      <button class="cfg-toggle" id="cfgAutoBak" onclick="toggleAutoBackup()" aria-label="Ativar auto-backup"></button>
+    </div>
+    <div class="cfg-help">⚠️ Com isso ativado, a cada alteração um arquivo será baixado para sua pasta Downloads. Recomendado ativar se você não usa sync com nuvem.</div>
+  </div>
+
+  <div class="cfg-section">
+    <h3>📁 Sincronização com Google Drive</h3>
+    <div class="cfg-row">
+      <div style="flex:1">
+        <label for="cfgDriveId" style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-weight:600;display:block;margin-bottom:4px">Client ID do Google</label>
+        <input id="cfgDriveId" type="text" placeholder="123456789-abc.apps.googleusercontent.com" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;font-family:ui-monospace,monospace;font-size:11px;color:var(--tx);outline:none">
+        <div id="cfgDriveStatus"></div>
+      </div>
+    </div>
+    <div class="cfg-row">
+      <div>
+        <div>Sincronizar automaticamente a cada alteração</div>
+        <div class="desc">Faz upload do JSON para o Drive sempre que você editar</div>
+      </div>
+      <button class="cfg-toggle" id="cfgDriveAuto" onclick="toggleDriveAuto()"></button>
+    </div>
+    <div class="cfg-help">
+      <b>Como obter o Client ID do Google:</b><br>
+      1. Acesse <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">console.cloud.google.com</a> e faça login<br>
+      2. Crie um projeto novo (qualquer nome)<br>
+      3. Menu → "APIs e Serviços" → "Biblioteca" → busque <code>Google Drive API</code> → ative<br>
+      4. Menu → "APIs e Serviços" → "Credenciais" → "Criar credencial" → "ID do cliente OAuth"<br>
+      5. Tipo: <code>Aplicativo da Web</code> · Origens JavaScript autorizadas: adicione <code id="cfgDriveOrigin">o endereço onde está hospedado o sermonário</code><br>
+      6. Copie o <b>Client ID</b> (termina em <code>.apps.googleusercontent.com</code>) e cole acima
+    </div>
+  </div>
+
+  <div class="cfg-section">
+    <h3>☁️ Sincronização com OneDrive</h3>
+    <div class="cfg-row">
+      <div style="flex:1">
+        <label for="cfgODId" style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-weight:600;display:block;margin-bottom:4px">Client ID (Application ID) do Azure</label>
+        <input id="cfgODId" type="text" placeholder="00000000-0000-0000-0000-000000000000" style="width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;font-family:ui-monospace,monospace;font-size:11px;color:var(--tx);outline:none">
+        <div id="cfgODStatus"></div>
+      </div>
+    </div>
+    <div class="cfg-row">
+      <div>
+        <div>Sincronizar automaticamente a cada alteração</div>
+        <div class="desc">Faz upload do JSON para o OneDrive sempre que você editar</div>
+      </div>
+      <button class="cfg-toggle" id="cfgODAuto" onclick="toggleODAuto()"></button>
+    </div>
+    <div class="cfg-help">
+      <b>Como obter o Client ID do OneDrive:</b><br>
+      1. Acesse <a href="https://entra.microsoft.com/" target="_blank" rel="noopener">entra.microsoft.com</a> (ou portal.azure.com) e faça login<br>
+      2. Menu → "Aplicativos" → "Registros de aplicativo" → "Novo registro"<br>
+      3. Nome: <code>Sermonario</code> · Tipos de conta: <i>Contas pessoais Microsoft (somente)</i> ou <i>Qualquer diretório + pessoais</i><br>
+      4. URI de redirecionamento: tipo <code>Aplicativo de página única (SPA)</code> → cole <code id="cfgODOrigin">o endereço onde está hospedado o sermonário</code><br>
+      5. Após criar, copie o <b>ID do aplicativo (cliente)</b> e cole acima<br>
+      6. Em "Permissões de API" verifique se está <code>Files.ReadWrite</code> (Microsoft Graph - Delegada)
+    </div>
+  </div>
+
+  <div class="cfg-section">
+    <h3>🔔 Lembretes</h3>
+    <div class="cfg-row">
+      <div>
+        <div>Avisar para fazer backup após:</div>
+        <div class="desc">Banner amarelo aparece no topo se passar do prazo</div>
+      </div>
+      <select id="cfgBakDays" style="padding:6px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;font-size:13px;color:var(--tx)">
+        <option value="3">3 dias</option>
+        <option value="7" selected>7 dias</option>
+        <option value="14">14 dias</option>
+        <option value="30">30 dias</option>
+        <option value="0">Nunca</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mfoot">
+    <button class="btn btn-ghost" onclick="closeM('mCfg')">Fechar</button>
+    <button class="btn btn-blue" onclick="saveCfg()">💾 Salvar configurações</button>
+  </div>
+</div></div>
+
+<!-- POPUP MENU SYNC -->
+<div class="syncpop" id="syncPop" role="menu"></div>
+
 <!-- MODAL: AJUDA -->
 <div class="ov" id="mHelp" role="dialog" aria-modal="true"><div class="modal" style="max-width:520px">
   <button class="mx" onclick="closeM('mHelp')" aria-label="Fechar">✕</button>
@@ -461,8 +601,8 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   <div class="slbl" style="margin-top:16px">Sobre</div>
   <div style="font-size:13px;color:var(--tx2);line-height:1.7">
     <p><b>Sermonário</b> é um organizador de sermões com busca, filtros, ministrações, exportação (PDF/Word) e consulta bíblica offline + online.</p>
-    <p style="margin-top:8px">Os dados ficam salvos <b>localmente</b> no seu navegador. Faça <b>backup</b> regularmente (botão ↓ Backup).</p>
-    <p style="margin-top:8px;font-size:11px;color:var(--tx4);">Versão 8 · Abril 2026</p>
+    <p style="margin-top:8px">Os dados ficam salvos <b>localmente</b> no seu navegador. Faça <b>backup</b> regularmente (botão ↓ Backup) ou ative sync com Drive/OneDrive em ⚙ Configurações.</p>
+    <p style="margin-top:8px;font-size:11px;color:var(--tx4);">Versão 9 · Abril 2026</p>
   </div>
   <div class="mfoot">
     <button class="btn btn-blue" onclick="closeM('mHelp')">Entendi</button>
@@ -472,7 +612,7 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 
-<!-- JSZip embutido para leitura de .docx offline -->
+<!-- JSZip embutido -->
 <script>/*!
 
 JSZip v3.10.1 - A JavaScript class for generating and reading zip files
@@ -489,10 +629,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 
 <script>
-// ── BANCO BÍBLICO ARC ─────
+// ── BANCO BÍBLICO ARC ─
 const ARC={"psalm 23":{"1":"O SENHOR é o meu pastor; nada me faltará.","2":"Ele me faz descansar em pastos verdejantes; leva-me para junto das águas de descanso.","3":"Refrigera a minha alma; guia-me pelas veredas da justiça, por amor do seu nome.","4":"Ainda que eu andasse pelo vale da sombra da morte, não temeria mal algum, porque tu estás comigo; o teu bordão e o teu cajado me consolam.","5":"Preparas uma mesa perante mim na presença dos meus adversários; unges a minha cabeça com óleo; o meu cálice transborda.","6":"Certamente que a bondade e a misericórdia me seguirão todos os dias da minha vida; e habitarei na casa do SENHOR por longos dias."},"psalm 91":{"1":"O que habita no esconderijo do Altíssimo, à sombra do Onipotente descansará.","2":"Direi do SENHOR: Ele é o meu Deus, o meu refúgio, e a minha fortaleza, e nele confiarei.","4":"Com as suas penas te cobrirá, e debaixo das suas asas te refugiarás; a sua verdade é escudo e broquel.","11":"Porque aos seus anjos dará ordem a teu respeito, para te guardarem em todos os teus caminhos.","14":"Pois ele me amou, eu o livrarei; protegê-lo-ei, porque conheceu o meu nome.","15":"Ele me invocará, e eu lhe responderei; na tribulação estarei com ele, livrá-lo-ei e o glorificarei.","16":"Com longura de dias o satisfarei e lhe mostrarei a minha salvação."},"psalm 37":{"4":"Deleita-te também no SENHOR, e ele te concederá o que deseja o teu coração.","5":"Entrega o teu caminho ao SENHOR; confia nele, e ele o fará.","23":"Os passos do homem bom são dirigidos pelo SENHOR; e ele se deleita no seu caminho.","24":"Ainda que caia, não ficará prostrado, porque o SENHOR lhe sustém a mão."},"psalm 40":{"1":"Esperando, esperei no SENHOR; ele se inclinou para mim e ouviu o meu clamor.","2":"Tirou-me de um lago horrível, do lodaçal lamacento, e pôs os meus pés sobre uma rocha, firme nos meus passos."},"psalm 119":{"9":"Como purificará o jovem o seu caminho? Observando-o segundo a tua palavra.","11":"No meu coração escondi as tuas palavras, para não pecar contra ti.","105":"Lâmpada para os meus pés é a tua palavra e luz para o meu caminho.","130":"A revelação das tuas palavras ilumina; dá entendimento aos símplices."},"john 3":{"16":"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.","17":"Porque Deus enviou o seu Filho ao mundo não para condenar o mundo, mas para que o mundo seja salvo por ele."},"john 14":{"1":"Não se turbe o vosso coração; credes em Deus, crede também em mim.","6":"Disse-lhe Jesus: Eu sou o caminho, e a verdade, e a vida; ninguém vem ao Pai senão por mim.","21":"Quem tem os meus mandamentos e os guarda, esse é o que me ama; e quem me ama será amado de meu Pai; e eu o amarei e me manifestarei a ele."},"john 15":{"4":"Ficai em mim e eu ficarei em vós. Como o ramo não pode dar fruto de si mesmo, se não ficar na videira, assim também vós, se não ficardes em mim.","5":"Eu sou a videira, e vós as varas; o que está em mim e eu nele, esse dá muito fruto; porque sem mim nada podeis fazer.","13":"Ninguém tem maior amor do que este: de dar alguém a sua vida pelos seus amigos."},"john 16":{"33":"No mundo tereis aflições; mas tende bom ânimo, eu venci o mundo."},"romans 8":{"1":"Portanto, agora nenhuma condenação há para os que estão em Cristo Jesus.","18":"Porque para mim tenho por certo que as aflições deste tempo presente não são para comparar com a glória que em nós há de ser revelada.","28":"E sabemos que todas as coisas contribuem juntamente para o bem daqueles que amam a Deus, daqueles que são chamados segundo o seu propósito.","31":"Que diremos, pois, acerca destas coisas? Se Deus é por nós, quem será contra nós?","37":"Mas em todas estas coisas somos mais do que vencedores, por meio daquele que nos amou."},"philippians 4":{"4":"Regozijai-vos sempre no Senhor; outra vez digo: Regozijai-vos.","6":"Não andeis ansiosos por coisa alguma; antes as vossas petições sejam em tudo conhecidas diante de Deus pela oração e súplica, com ação de graças.","7":"E a paz de Deus, que excede todo o entendimento, guardará os vossos corações e os vossos pensamentos em Cristo Jesus.","13":"Posso tudo em Cristo que me fortalece.","19":"O meu Deus, segundo as suas riquezas em glória, suprirá todas as vossas necessidades em Cristo Jesus."},"isaiah 40":{"29":"Ele dá forças ao cansado e multiplica as forças ao que não tem nenhum vigor.","31":"Mas os que esperam no SENHOR renovarão as suas forças; subirão com asas como águias; correrão e não se cansarão; caminharão e não se fatigarão."},"jeremiah 29":{"11":"Porque eu sei os pensamentos que tenho a vosso respeito, diz o SENHOR; pensamentos de paz e não de mal, para vos dar o fim que esperais."},"hebrews 11":{"1":"Ora, a fé é o firme fundamento das coisas que se esperam e a prova das coisas que não se veem.","6":"E sem fé é impossível agradar a Deus; porque é necessário que aquele que se aproxima de Deus creia que ele existe, e que é galardoador dos que o buscam."},"joshua 1":{"8":"Não se aparte da tua boca o livro desta lei; antes medita nele dia e noite, para que tenhas cuidado de fazer conforme tudo quanto nele está escrito; porque então farás prosperar o teu caminho.","9":"Sê forte e corajoso; não te atemorizas nem te espantes, porque o SENHOR teu Deus é contigo, por onde quer que andares."},"galatians 6":{"9":"Não nos cansemos de fazer o bem, porque a seu tempo ceifaremos, se não desfalecermos."},"matthew 28":{"18":"E, chegando Jesus, falou-lhes, dizendo: Todo o poder me é dado no céu e na terra.","19":"Portanto, ide, fazei discípulos de todas as nações, batizando-os em nome do Pai, e do Filho, e do Espírito Santo.","20":"Ensinando-os a guardar todas as coisas que eu vos tenho mandado; e eis que eu estou convosco todos os dias, até a consumação dos séculos."},"proverbs 3":{"5":"Confia no SENHOR de todo o teu coração, e não te estribes no teu próprio entendimento.","6":"Reconhece-o em todos os teus caminhos, e ele endireitará as tuas veredas."},"1peter 5":{"7":"Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.","10":"E o Deus de toda a graça, que em Cristo Jesus vos chamou para a sua glória eterna, depois de haverdes sofrido um pouco, ele mesmo vos aperfeiçoará, confirmará, fortificará e estabelecerá."},"acts 12":{"5":"Pedro, pois, estava guardado na prisão; mas a igreja fazia contínua oração por ele a Deus."},"2chronicles 15":{"7":"Mas esforçai-vos e não desfaleçam as vossas mãos, pois há recompensa para o vosso trabalho."},"genesis 1":{"26":"E disse Deus: Façamos o homem à nossa imagem, conforme a nossa semelhança; e domine sobre os peixes do mar, e sobre as aves dos céus, e sobre os animais domésticos, e sobre toda a terra."},"colossians 3":{"3":"Porque morrestes, e a vossa vida está escondida com Cristo em Deus."},"1corinthians 10":{"4":"E todos beberam a mesma bebida espiritual; porque bebiam da pedra espiritual que os seguia; e a pedra era Cristo."},"genesis 19":{"26":"E a mulher de Ló olhou para trás e ficou convertida numa estátua de sal."},"genesis 13":{"9":"Não está toda a terra diante de ti? Aparta-te de mim; se escolheres a esquerda, irei para a direita; e, se à direita escolheres, eu irei para a esquerda."},"genesis 28":{"17":"E temeu e disse: Quão terrível é este lugar! Este não é outro lugar senão a casa de Deus; e esta é a porta dos céus."},"genesis 2":{"7":"E formou o SENHOR Deus o homem do pó da terra e soprou em seus narizes o fôlego da vida; e o homem foi feito alma vivente."},"isaiah 25":{"7":"E destruirá, neste monte, a máscara do rosto com que todos os povos andam cobertos e o véu com que todas as nações se escondem."},"isaiah 41":{"10":"Não temas, porque eu sou contigo; não te assombres, porque eu sou o teu Deus; eu te fortaleço, e te ajudo, e te sustento com a minha destra fiel.","13":"Porque eu, o SENHOR, teu Deus, te tomo pela tua mão direita e te digo: Não temas, que eu te ajudo."},"isaiah 43":{"18":"Não vos lembreis das coisas passadas, nem considereis as antigas.","19":"Eis que farei uma coisa nova, e agora sairá à luz; porventura, não a sabereis? Eis que porei um caminho no deserto e rios no ermo."},"isaiah 60":{"1":"Levanta-te, resplandece, porque já vem a tua luz, e a glória do SENHOR vai nascendo sobre ti."},"luke 17":{"28":"Semelhantemente, como aconteceu nos dias de Ló: comiam, bebiam, compravam, vendiam, plantavam, edificavam.","32":"Lembrai-vos da mulher de Ló."},"luke 24":{"28":"E chegaram à aldeia aonde iam, e ele fez como quem ia para mais longe.","32":"E disseram um ao outro: Não ardia o nosso coração em nós, quando ele nos falava pelo caminho, e quando nos abria as Escrituras?"},"john 8":{"7":"Aquele que dentre vós está sem pecado seja o primeiro que atire pedra contra ela.","11":"E ela disse: Ninguém, Senhor. E disse-lhe Jesus: Nem eu te condeno; vai e não peques mais."},"john 10":{"11":"Eu sou o bom pastor; o bom pastor dá a sua vida pelas ovelhas.","14":"Eu sou o bom pastor; e conheço as minhas ovelhas e sou conhecido delas."},"john 11":{"25":"Disse-lhe Jesus: Eu sou a ressurreição e a vida; quem crê em mim, ainda que esteja morto, viverá.","43":"E, dito isso, clamou em alta voz: Lázaro, vem para fora!"},"matthew 14":{"29":"E ele disse: Vem. E Pedro, descendo do barco, andou sobre as águas para ir ter com Jesus.","31":"Jesus, estendendo logo a mão, o segurou e disse-lhe: Homem de pouca fé, por que duvidaste?"},"matthew 9":{"17":"Ninguém põe vinho novo em odres velhos; de outra maneira, os odres se rompem, e o vinho se derrama, e os odres se perdem; mas põem vinho novo em odres novos, e ambas as coisas se conservam."},"numbers 11":{"4":"E o vulgo que havia entre eles veio a ter grande desejo, e os filhos de Israel tornaram a chorar, dizendo: Quem nos há de dar carne a comer?"},"revelation 3":{"20":"Eis que estou à porta e bato; se alguém ouvir a minha voz e abrir a porta, entrarei em sua casa e com ele cearei, e ele comigo."},"2corinthians 5":{"17":"Assim que, se alguém está em Cristo, nova criatura é; as coisas velhas já passaram; eis que tudo se fez novo."},"2peter 1":{"19":"E temos, mui firme, a palavra dos profetas, à qual bem fazeis em estar atentos, como a uma luz que ilumina em lugar escuro, até que o dia amanheça."},"philippians 3":{"13":"Irmãos, eu ainda não me considero como tendo alcançado; mas uma coisa faço: esquecendo-me das coisas que atrás ficam e avançando para as que estão adiante.","14":"Prossigo para o alvo, para o prêmio da soberana vocação de Deus em Cristo Jesus."},"acts 2":{"42":"E perseveravam na doutrina dos apóstolos, e na comunhão, e no partir do pão, e nas orações."},"hebrews 12":{"2":"Olhando para Jesus, autor e consumador da fé, o qual, pelo gozo que lhe estava proposto, suportou a cruz, desprezando a afronta, e assentou-se à destra do trono de Deus."},"ephesians 5":{"8":"Porque noutro tempo éreis trevas, mas agora sois luz no Senhor; andai como filhos da luz."},"malachi 3":{"18":"Então voltareis e vereis a diferença entre o justo e o ímpio; entre o que serve a Deus e o que não o serve."},"joel 2":{"26":"E comereis abundantemente e vos fartareis, e louvareis o nome do SENHOR, vosso Deus, que fez maravilhas convosco; e o meu povo nunca mais será envergonhado."},"exodus 14":{"14":"O SENHOR pelejará por vós, e vós estareis quietos."},"psalm 4":{"8":"Em paz me deitarei e dormirei, porque só tu, SENHOR, me fazes habitar em segurança."},"psalm 66":{"5":"Vinde e vede as obras de Deus; ele é terrível em seus feitos para com os filhos dos homens."},"psalm 139":{"14":"Render-te-ei graças, porque de um modo terrível e maravilhoso me formaste; maravilhosas são as tuas obras, e a minha alma o sabe muito bem."},"psalm 77":{"10":"E eu disse: Esta é a minha fraqueza, mas lembrarei os anos da destra do Altíssimo."},"psalm 115":{"1":"Não a nós, SENHOR, não a nós, mas ao teu nome dá glória, por amor da tua benignidade e da tua verdade."},"psalm 32":{"1":"Bem-aventurado aquele cuja transgressão é perdoada e cujo pecado é coberto.","2":"Bem-aventurado o homem a quem o SENHOR não imputa iniquidade e em cujo espírito não há engano."},"isaiah 53":{"10":"Mas ao SENHOR agradou moê-lo e afligi-lo; quando a sua alma se puser como oferta pelo pecado, verá a sua posteridade, prolongará os seus dias."},"micah 5":{"2":"E tu, Belém Efratá, posto que pequena entre os milhares de Judá, de ti me sairá o que há de reinar em Israel, cujas saídas são desde o tempo antigo, desde os dias da eternidade."},"mark 9":{"7":"E houve uma nuvem que os cobriu com a sua sombra; e veio uma voz da nuvem, dizendo: Este é o meu Filho amado; a ele ouvi."},"ezekiel 18":{"4":"Eis que todas as almas são minhas; como a alma do pai, assim a alma do filho é minha; a alma que pecar, essa morrerá."}};
 
-// ── SEED ──
+// ── SEED ─
 const SEED = [
   {id:'jo1',title:'As Lutas e o Egoísmo Humano',ref:'Jó 3',theme:'Série: Livro de Jó',type:'Expositivo',date:'',url:'https://docs.google.com/document/d/1r95OOyhmjmTUXZTvqB2fAdJPisUlESw8G8W0CXKw-Dw/edit',m:0,log:[],outline:'I. Discurso de Jó após 7 dias de silêncio — amaldiçoa sua vida, não a Deus\nII. 3.3-10 — Maldição focada no passado\nIII. 3.11 — O desejo de ser natimorto\nIV. Cuidado com o egoísmo em meio às lutas (Jonas 4.8)\nV. 3.23 — Aqueles que estão no Caminho (At 9.2)'},
   {id:'jo2',title:'Elifaz e a Doutrina da Retribuição',ref:'Jó 4-5',theme:'Série: Livro de Jó',type:'Expositivo',date:'',url:'',m:0,log:[],outline:'I. 4.1 — Elifaz, o mais velho dos amigos, fala primeiro\nII. 4.2 — Cuidado com conclusões precipitadas\nIII. 4.8 — A Doutrina da Retribuição\nIV. Gl 6.1,3,7 — O defeito que notamos nos outros pode estar em nós\nV. Lc 13.1-3 — Quem é mais pecador?'},
@@ -700,6 +840,78 @@ function save(){
       console.error('Erro ao salvar:', e);
     }
   }
+  scheduleAutoBackup();
+  scheduleCloudSync();
+}
+
+// ── AUTO-BACKUP LOCAL ─────────────────────────────────
+const ABK_FLAG = 'sermonario_autobackup'; // 'on' | 'off'
+const ABK_LAST = 'sermonario_lastbackup'; // ISO date string
+const BACKUP_REMIND_DAYS = 7;
+
+const scheduleAutoBackup = debounce(() => {
+  if(localStorage.getItem(ABK_FLAG) !== 'on') return;
+  doAutoBackup();
+}, 3000);
+
+function doAutoBackup(){
+  try{
+    const blob = new Blob([JSON.stringify(SS, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sermonario_autobackup_' + new Date().toISOString().split('T')[0] + '.json';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 1000);
+    localStorage.setItem(ABK_LAST, new Date().toISOString());
+    updateBackupReminder();
+  }catch(e){ console.error('auto-backup falhou:', e); }
+}
+
+function toggleAutoBackup(){
+  const cur = localStorage.getItem(ABK_FLAG) === 'on';
+  localStorage.setItem(ABK_FLAG, cur ? 'off' : 'on');
+  toast(cur ? 'Auto-backup desativado' : 'Auto-backup ativado — JSON será baixado a cada alteração','ok');
+  updateBackupUI();
+}
+
+// ── LEMBRETE DE BACKUP ────────────────────────────────
+function getBackupRemindDays(){
+  const v = parseInt(localStorage.getItem(CFG_BAK_DAYS));
+  if(isNaN(v) || v < 0) return BACKUP_REMIND_DAYS;
+  return v;
+}
+
+function updateBackupReminder(){
+  const last = localStorage.getItem(ABK_LAST);
+  const banner = document.getElementById('backupBanner');
+  if(!banner) return;
+  const days = getBackupRemindDays();
+  if(days === 0){ banner.style.display = 'none'; return; }
+  if(!last){
+    banner.style.display = 'flex';
+    banner.querySelector('.bbk-msg').textContent = '⚠ Você ainda não fez backup. Clique em ↓ Backup agora para baixar uma cópia segura.';
+    return;
+  }
+  const elapsed = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+  if(elapsed >= days){
+    banner.style.display = 'flex';
+    banner.querySelector('.bbk-msg').textContent = '⚠ Último backup há ' + elapsed + ' dias. Faça um novo backup para não perder nada.';
+  }else{
+    banner.style.display = 'none';
+  }
+}
+
+function updateBackupUI(){
+  const btn = document.getElementById('btnAutoBak');
+  if(!btn) return;
+  const on = localStorage.getItem(ABK_FLAG) === 'on';
+  btn.textContent = on ? '⚙ Auto-backup: ON' : '⚙ Auto-backup: OFF';
+  btn.style.color = on ? 'var(--gn)' : 'var(--tx3)';
 }
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
@@ -1403,6 +1615,8 @@ function doBackup(){
     a.download = 'sermonario_backup_' + new Date().toISOString().split('T')[0] + '.json';
     a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+    localStorage.setItem(ABK_LAST, new Date().toISOString());
+    updateBackupReminder();
     toast('Backup exportado! ('+SS.length+' sermões)','ok');
   }catch(e){
     toast('Erro ao exportar backup.','err');
@@ -1729,10 +1943,489 @@ document.addEventListener('click', e => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════
+// ── MÓDULO DE SINCRONIZAÇÃO COM NUVEM (Drive + OneDrive) ──────
+// ═══════════════════════════════════════════════════════════════
+
+// Storage keys
+const CFG_DRIVE_ID = 'sermonario_drive_clientid';
+const CFG_OD_ID    = 'sermonario_od_clientid';
+const CFG_DRIVE_AUTO = 'sermonario_drive_auto';
+const CFG_OD_AUTO  = 'sermonario_od_auto';
+const CFG_BAK_DAYS = 'sermonario_bakdays';
+const DRIVE_FILE_ID = 'sermonario_drive_fileid';
+const OD_FILE_ID    = 'sermonario_od_fileid';
+const FILENAME = 'sermonario.json';
+
+// Estado runtime
+let driveAccessToken = null;
+let odAccessToken = null;
+let driveLibLoaded = false;
+let odLibLoaded = false;
+
+// ── HELPERS ──────────────────────────────────────────
+function loadScriptOnce(src){
+  return new Promise((resolve, reject) => {
+    if(document.querySelector(`script[src="${src}"]`)){ resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('Falha ao carregar ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+function getOrigin(){
+  // Para apps abertos via file:// retorna string explicativa
+  if(location.protocol === 'file:') return 'file:// (não funciona — hospede o arquivo)';
+  return location.origin + (location.pathname.endsWith('/') ? location.pathname : location.pathname.replace(/[^/]*$/, ''));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── GOOGLE DRIVE ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+async function loadGoogleLibs(){
+  if(driveLibLoaded) return;
+  await loadScriptOnce('https://accounts.google.com/gsi/client');
+  await loadScriptOnce('https://apis.google.com/js/api.js');
+  await new Promise((res) => gapi.load('client', res));
+  await gapi.client.init({
+    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+  });
+  driveLibLoaded = true;
+}
+
+async function driveSignIn(){
+  const cid = localStorage.getItem(CFG_DRIVE_ID);
+  if(!cid){ toast('Configure o Client ID do Google primeiro (⚙)','err'); openSettings(); return false; }
+  if(location.protocol === 'file:'){ toast('Sync com nuvem requer hospedagem (não funciona em file://)','err'); return false; }
+  try{
+    await loadGoogleLibs();
+  }catch(e){
+    toast('Sem internet ou bibliotecas Google bloqueadas.','err');
+    return false;
+  }
+  return new Promise((resolve) => {
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: cid,
+      scope: GOOGLE_SCOPES,
+      callback: (resp) => {
+        if(resp.error){
+          toast('Login Google cancelado: ' + resp.error,'err');
+          resolve(false); return;
+        }
+        driveAccessToken = resp.access_token;
+        gapi.client.setToken({access_token: driveAccessToken});
+        toast('Conectado ao Google Drive ✓','ok');
+        updateSyncButtons();
+        resolve(true);
+      }
+    });
+    tokenClient.requestAccessToken({prompt: ''});
+  });
+}
+
+async function driveFindOrCreateFile(){
+  // Procura arquivo existente pelo nome
+  let fileId = localStorage.getItem(DRIVE_FILE_ID);
+  if(fileId){
+    // Verifica se ainda existe
+    try{
+      const r = await gapi.client.drive.files.get({fileId, fields:'id,name'});
+      if(r.result.id) return fileId;
+    }catch{
+      localStorage.removeItem(DRIVE_FILE_ID);
+      fileId = null;
+    }
+  }
+  // Busca pelo nome
+  const list = await gapi.client.drive.files.list({
+    q: `name='${FILENAME}' and trashed=false`,
+    fields: 'files(id,name,modifiedTime)',
+    spaces: 'drive'
+  });
+  if(list.result.files && list.result.files.length){
+    fileId = list.result.files[0].id;
+    localStorage.setItem(DRIVE_FILE_ID, fileId);
+    return fileId;
+  }
+  // Cria novo
+  const create = await gapi.client.drive.files.create({
+    resource: {name: FILENAME, mimeType: 'application/json'},
+    fields: 'id'
+  });
+  fileId = create.result.id;
+  localStorage.setItem(DRIVE_FILE_ID, fileId);
+  return fileId;
+}
+
+async function driveUpload(silent){
+  if(!driveAccessToken){
+    if(!await driveSignIn()) return false;
+  }
+  try{
+    const fileId = await driveFindOrCreateFile();
+    const content = JSON.stringify(SS, null, 2);
+    // Upload via PATCH multipart simples
+    const boundary = '-------314159265358979323846';
+    const delim = '\r\n--' + boundary + '\r\n';
+    const closeDelim = '\r\n--' + boundary + '--';
+    const metadata = {mimeType: 'application/json'};
+    const body = delim +
+      'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) +
+      delim +
+      'Content-Type: application/json\r\n\r\n' + content +
+      closeDelim;
+    const resp = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': 'Bearer ' + driveAccessToken,
+        'Content-Type': 'multipart/related; boundary=' + boundary
+      },
+      body
+    });
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    if(!silent) toast('✓ Enviado para Google Drive ('+SS.length+' sermões)','ok');
+    localStorage.setItem(ABK_LAST, new Date().toISOString());
+    updateBackupReminder();
+    return true;
+  }catch(e){
+    if(!silent) toast('Erro ao enviar para Drive: ' + e.message,'err');
+    console.error(e);
+    return false;
+  }
+}
+
+async function driveDownload(){
+  if(!driveAccessToken){
+    if(!await driveSignIn()) return null;
+  }
+  try{
+    const fileId = await driveFindOrCreateFile();
+    const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+      headers: {'Authorization': 'Bearer ' + driveAccessToken}
+    });
+    if(!resp.ok){
+      if(resp.status === 404){ toast('Arquivo ainda não existe no Drive. Faça um upload primeiro.','err'); return null; }
+      throw new Error('HTTP ' + resp.status);
+    }
+    const text = await resp.text();
+    if(!text.trim()) { toast('Arquivo no Drive está vazio.','err'); return null; }
+    const data = JSON.parse(text);
+    if(!Array.isArray(data)) throw new Error('formato inválido');
+    return data;
+  }catch(e){
+    toast('Erro ao baixar do Drive: ' + e.message,'err');
+    return null;
+  }
+}
+
+async function driveRestore(){
+  const data = await driveDownload();
+  if(!data) return;
+  if(!confirm(`Substituir todos os ${SS.length} sermões locais pelos ${data.length} do Google Drive?\n\nFaça um backup local antes se quiser preservar a versão atual.`)) return;
+  SS = data.map(s => ({...s, m: s.m||0, log: s.log||[]}));
+  // Salvar SEM disparar auto-sync (evita loop)
+  localStorage.setItem(SK, JSON.stringify(SS));
+  render();
+  toast('✓ Restaurado do Google Drive ('+SS.length+' sermões)','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── ONEDRIVE (via Microsoft Graph + MSAL) ─────────────────────
+// ═══════════════════════════════════════════════════════════════
+const OD_SCOPES = ['Files.ReadWrite', 'User.Read'];
+let msalInstance = null;
+
+async function loadODLibs(){
+  if(odLibLoaded) return;
+  await loadScriptOnce('https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js');
+  odLibLoaded = true;
+}
+
+async function odSignIn(){
+  const cid = localStorage.getItem(CFG_OD_ID);
+  if(!cid){ toast('Configure o Client ID do OneDrive primeiro (⚙)','err'); openSettings(); return false; }
+  if(location.protocol === 'file:'){ toast('Sync com nuvem requer hospedagem (não funciona em file://)','err'); return false; }
+  try{
+    await loadODLibs();
+  }catch(e){
+    toast('Sem internet ou bibliotecas Microsoft bloqueadas.','err');
+    return false;
+  }
+  if(!msalInstance){
+    msalInstance = new msal.PublicClientApplication({
+      auth: {
+        clientId: cid,
+        authority: 'https://login.microsoftonline.com/common',
+        redirectUri: getOrigin()
+      },
+      cache: {cacheLocation: 'localStorage'}
+    });
+    await msalInstance.initialize();
+  }
+  try{
+    let account = msalInstance.getAllAccounts()[0];
+    if(!account){
+      const r = await msalInstance.loginPopup({scopes: OD_SCOPES, prompt: 'select_account'});
+      account = r.account;
+    }
+    const tk = await msalInstance.acquireTokenSilent({scopes: OD_SCOPES, account}).catch(async () => {
+      return await msalInstance.acquireTokenPopup({scopes: OD_SCOPES, account});
+    });
+    odAccessToken = tk.accessToken;
+    toast('Conectado ao OneDrive ✓','ok');
+    updateSyncButtons();
+    return true;
+  }catch(e){
+    toast('Login OneDrive falhou: ' + e.message,'err');
+    return false;
+  }
+}
+
+async function odUpload(silent){
+  if(!odAccessToken){
+    if(!await odSignIn()) return false;
+  }
+  try{
+    const content = JSON.stringify(SS, null, 2);
+    const url = `https://graph.microsoft.com/v1.0/me/drive/root:/${encodeURIComponent(FILENAME)}:/content`;
+    const resp = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + odAccessToken,
+        'Content-Type': 'application/json'
+      },
+      body: content
+    });
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if(data.id) localStorage.setItem(OD_FILE_ID, data.id);
+    if(!silent) toast('✓ Enviado para OneDrive ('+SS.length+' sermões)','ok');
+    localStorage.setItem(ABK_LAST, new Date().toISOString());
+    updateBackupReminder();
+    return true;
+  }catch(e){
+    if(!silent) toast('Erro ao enviar para OneDrive: ' + e.message,'err');
+    console.error(e);
+    return false;
+  }
+}
+
+async function odDownload(){
+  if(!odAccessToken){
+    if(!await odSignIn()) return null;
+  }
+  try{
+    const url = `https://graph.microsoft.com/v1.0/me/drive/root:/${encodeURIComponent(FILENAME)}:/content`;
+    const resp = await fetch(url, {
+      headers: {'Authorization': 'Bearer ' + odAccessToken}
+    });
+    if(resp.status === 404){ toast('Arquivo ainda não existe no OneDrive. Faça um upload primeiro.','err'); return null; }
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const text = await resp.text();
+    if(!text.trim()){ toast('Arquivo no OneDrive está vazio.','err'); return null; }
+    const data = JSON.parse(text);
+    if(!Array.isArray(data)) throw new Error('formato inválido');
+    return data;
+  }catch(e){
+    toast('Erro ao baixar do OneDrive: ' + e.message,'err');
+    return null;
+  }
+}
+
+async function odRestore(){
+  const data = await odDownload();
+  if(!data) return;
+  if(!confirm(`Substituir todos os ${SS.length} sermões locais pelos ${data.length} do OneDrive?\n\nFaça um backup local antes se quiser preservar a versão atual.`)) return;
+  SS = data.map(s => ({...s, m: s.m||0, log: s.log||[]}));
+  localStorage.setItem(SK, JSON.stringify(SS));
+  render();
+  toast('✓ Restaurado do OneDrive ('+SS.length+' sermões)','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── AUTO-SYNC (chamado pelo save() com debounce) ─────────────
+// ═══════════════════════════════════════════════════════════════
+const scheduleCloudSync = debounce(async () => {
+  const driveAuto = localStorage.getItem(CFG_DRIVE_AUTO) === 'on';
+  const odAuto = localStorage.getItem(CFG_OD_AUTO) === 'on';
+  if(driveAuto && driveAccessToken){ await driveUpload(true); }
+  if(odAuto && odAccessToken){ await odUpload(true); }
+}, 5000);
+
+// ═══════════════════════════════════════════════════════════════
+// ── MENU POPUP DE SYNC ───────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+function syncMenu(provider){
+  const pop = document.getElementById('syncPop');
+  const btn = document.getElementById(provider === 'drive' ? 'btnSyncDrive' : 'btnSyncOD');
+  const cid = localStorage.getItem(provider === 'drive' ? CFG_DRIVE_ID : CFG_OD_ID);
+  const connected = provider === 'drive' ? !!driveAccessToken : !!odAccessToken;
+  const auto = localStorage.getItem(provider === 'drive' ? CFG_DRIVE_AUTO : CFG_OD_AUTO) === 'on';
+  const upload = provider === 'drive' ? () => driveUpload(false) : () => odUpload(false);
+  const restore = provider === 'drive' ? driveRestore : odRestore;
+  const signIn = provider === 'drive' ? driveSignIn : odSignIn;
+  const label = provider === 'drive' ? 'Google Drive' : 'OneDrive';
+
+  pop.innerHTML = '';
+
+  if(!cid){
+    pop.innerHTML = `
+      <div style="padding:14px;font-size:13px;color:var(--tx2)">
+        <b>${label} não configurado</b>
+        <div style="font-size:11px;color:var(--tx4);margin-top:4px">Configure o Client ID em ⚙ Configurações.</div>
+      </div>
+      <button class="syncpop-item" onclick="closeSyncPop();openSettings()"><span class="ic">⚙</span><span>Abrir Configurações</span></button>`;
+  }else{
+    pop.innerHTML = `
+      <button class="syncpop-item" onclick="closeSyncPop();(${connected ? 'null' : provider === 'drive' ? 'driveSignIn' : 'odSignIn'} || (()=>{}))()" ${connected?'disabled':''}>
+        <span class="ic">🔐</span><span>${connected ? 'Conectado ✓' : 'Conectar'}</span>
+      </button>
+      <button class="syncpop-item" onclick="closeSyncPop();(${provider === 'drive' ? 'driveUpload' : 'odUpload'})(false)">
+        <span class="ic">↑</span><span>Enviar agora (upload)</span>
+      </button>
+      <button class="syncpop-item" onclick="closeSyncPop();(${provider === 'drive' ? 'driveRestore' : 'odRestore'})()">
+        <span class="ic">↓</span><span>Restaurar do ${label}</span>
+      </button>
+      <div class="syncpop-sep"></div>
+      <div class="syncpop-status">
+        ${connected ? '🟢 Conectado · ' : '⚪ Desconectado · '}
+        ${auto ? 'Auto-sync ON' : 'Auto-sync OFF'}
+      </div>`;
+  }
+
+  // Posicionar próximo ao botão
+  const r = btn.getBoundingClientRect();
+  pop.style.top = (r.bottom + 6) + 'px';
+  pop.style.left = Math.max(8, r.left) + 'px';
+  pop.classList.add('open');
+
+  setTimeout(() => {
+    const fn = (e) => {
+      if(!pop.contains(e.target) && e.target !== btn){
+        closeSyncPop();
+        document.removeEventListener('click', fn);
+      }
+    };
+    document.addEventListener('click', fn);
+  }, 100);
+}
+
+function closeSyncPop(){ document.getElementById('syncPop').classList.remove('open'); }
+
+function updateSyncButtons(){
+  const bd = document.getElementById('btnSyncDrive');
+  const bo = document.getElementById('btnSyncOD');
+  if(bd) bd.style.color = driveAccessToken ? 'var(--gn)' : '';
+  if(bo) bo.style.color = odAccessToken ? 'var(--gn)' : '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── MODAL DE CONFIGURAÇÕES ───────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+function openSettings(){
+  // Carregar valores
+  document.getElementById('cfgDriveId').value = localStorage.getItem(CFG_DRIVE_ID) || '';
+  document.getElementById('cfgODId').value = localStorage.getItem(CFG_OD_ID) || '';
+  document.getElementById('cfgBakDays').value = localStorage.getItem(CFG_BAK_DAYS) || '7';
+
+  setToggle('cfgAutoBak', localStorage.getItem(ABK_FLAG) === 'on');
+  setToggle('cfgDriveAuto', localStorage.getItem(CFG_DRIVE_AUTO) === 'on');
+  setToggle('cfgODAuto', localStorage.getItem(CFG_OD_AUTO) === 'on');
+
+  // Mostrar origem detectada
+  const origin = getOrigin();
+  document.getElementById('cfgDriveOrigin').textContent = origin;
+  document.getElementById('cfgODOrigin').textContent = origin;
+
+  // Status de conexão
+  updateCfgStatus();
+
+  openM('mCfg');
+}
+
+function setToggle(id, on){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.toggle('on', !!on);
+}
+
+function toggleAutoBackup(){
+  const cur = localStorage.getItem(ABK_FLAG) === 'on';
+  localStorage.setItem(ABK_FLAG, cur ? 'off' : 'on');
+  setToggle('cfgAutoBak', !cur);
+}
+function toggleDriveAuto(){
+  const cur = localStorage.getItem(CFG_DRIVE_AUTO) === 'on';
+  localStorage.setItem(CFG_DRIVE_AUTO, cur ? 'off' : 'on');
+  setToggle('cfgDriveAuto', !cur);
+}
+function toggleODAuto(){
+  const cur = localStorage.getItem(CFG_OD_AUTO) === 'on';
+  localStorage.setItem(CFG_OD_AUTO, cur ? 'off' : 'on');
+  setToggle('cfgODAuto', !cur);
+}
+
+function updateCfgStatus(){
+  const ds = document.getElementById('cfgDriveStatus');
+  const os = document.getElementById('cfgODStatus');
+  if(ds){
+    if(driveAccessToken) ds.innerHTML = '<div class="cfg-status ok">🟢 Conectado ao Drive</div>';
+    else if(localStorage.getItem(CFG_DRIVE_ID)) ds.innerHTML = '<div class="cfg-status no">⚪ Configurado mas desconectado</div>';
+    else ds.innerHTML = '';
+  }
+  if(os){
+    if(odAccessToken) os.innerHTML = '<div class="cfg-status ok">🟢 Conectado ao OneDrive</div>';
+    else if(localStorage.getItem(CFG_OD_ID)) os.innerHTML = '<div class="cfg-status no">⚪ Configurado mas desconectado</div>';
+    else os.innerHTML = '';
+  }
+}
+
+function saveCfg(){
+  const driveId = document.getElementById('cfgDriveId').value.trim();
+  const odId = document.getElementById('cfgODId').value.trim();
+  const bakDays = document.getElementById('cfgBakDays').value;
+
+  // Validação básica
+  if(driveId && !driveId.endsWith('.apps.googleusercontent.com')){
+    if(!confirm('O Client ID do Google geralmente termina em ".apps.googleusercontent.com". Tem certeza?')) return;
+  }
+  if(odId && !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(odId)){
+    if(!confirm('O Client ID do OneDrive geralmente é um UUID. Tem certeza?')) return;
+  }
+
+  localStorage.setItem(CFG_DRIVE_ID, driveId);
+  localStorage.setItem(CFG_OD_ID, odId);
+  localStorage.setItem(CFG_BAK_DAYS, bakDays);
+
+  // Atualiza dias de lembrete em tempo real
+  updateBackupReminder();
+  updateBackupUI();
+  updateSyncButtons();
+  closeM('mCfg');
+  toast('Configurações salvas','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
 // ── INIT ─────────────────────────────────────────────
 try { loadTheme(); } catch(e) { console.error('Erro ao carregar tema:', e); }
 load();
 render();
+// Após carregar tudo, verificar lembrete de backup e atualizar UIs
+setTimeout(() => {
+  // Aplicar dias customizados de lembrete se houver
+  const days = parseInt(localStorage.getItem(CFG_BAK_DAYS));
+  if(!isNaN(days) && days > 0) {
+    // Sobrescrever a constante local através de uma cópia (já que é const)
+    // Nota: vou usar uma var module-level para isso
+  }
+  updateBackupReminder();
+  updateBackupUI();
+}, 100);
 </script>
 </body>
 </html>
