@@ -280,6 +280,33 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   .lst tbody td.c-theme,.lst tbody td.c-date{display:none;}
   .lst thead th.h-theme,.lst thead th.h-date{display:none;}
 }
+/* DUPLICADOS */
+.dup-tools{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--bd);}
+.dup-tools > div{flex:1;min-width:200px;}
+.dup-tools select{width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;font-size:13px;color:var(--tx);margin-top:4px;}
+.dup-info{font-size:12px;color:var(--tx3);margin-bottom:10px;padding:8px 10px;background:var(--sf2);border-radius:6px;border:1px solid var(--bd2);}
+.dup-group{border:2px solid var(--gd);border-radius:10px;padding:12px;margin-bottom:12px;background:var(--gd2);}
+[data-theme="dark"] .dup-group{background:#2d2415;border-color:#6a4820;}
+.dup-group-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;}
+.dup-sim-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gd);color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;}
+.dup-items{display:flex;flex-direction:column;gap:8px;}
+.dup-item{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;position:relative;}
+.dup-item.most-complete{border-color:var(--gn);border-width:2px;}
+.dup-item.most-complete::before{content:'✓ MAIS COMPLETO';position:absolute;top:-9px;left:10px;background:var(--gn);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.08em;}
+.dup-item-title{font-weight:700;font-size:13px;color:var(--tx);margin-bottom:4px;}
+.dup-item-meta{font-size:11px;color:var(--tx4);display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+.dup-item-meta b{color:var(--ac);font-weight:600;}
+.dup-item-outline{font-size:11px;color:var(--tx3);max-height:60px;overflow:hidden;line-height:1.4;position:relative;padding-bottom:4px;}
+.dup-item-outline::after{content:'';position:absolute;bottom:0;left:0;right:0;height:20px;background:linear-gradient(transparent, var(--sf));pointer-events:none;}
+.dup-item-acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.dup-item-acts button{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--tx2);cursor:pointer;font-family:inherit;}
+.dup-item-acts button:hover{border-color:var(--ac);color:var(--ac);}
+.dup-item-acts button.danger:hover{border-color:var(--rd);color:var(--rd);background:var(--rd2);}
+.dup-group-acts{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd);flex-wrap:wrap;}
+.dup-group-acts .btn-merge{background:var(--gn);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.dup-group-acts .btn-merge:hover{opacity:.85;}
+.dup-empty{text-align:center;padding:40px 20px;color:var(--tx3);}
+.dup-empty-i{font-size:48px;opacity:.2;margin-bottom:10px;}
 /* TOAST */
 .toast{position:fixed;bottom:18px;right:18px;background:var(--ox);color:#fff;padding:9px 14px;border-radius:9px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999;box-shadow:0 6px 20px rgba(0,33,71,.25);border-left:3px solid #7aa5e0;max-width:260px;}
 .toast.show{opacity:1;transform:none;}
@@ -360,6 +387,7 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   <button class="btn btn-dark" onclick="openBible()" title="Bíblia (B)">📖 Bíblia</button>
   <button class="btn btn-ghost" onclick="openList()" title="Lista de sermões (L)">📋 Lista</button>
   <button class="btn btn-ghost" onclick="openDashboard()" title="Dashboard (D)">📊 Dashboard</button>
+  <button class="btn btn-ghost" onclick="openDupFinder()" title="Encontrar duplicados">🔗 Duplicados</button>
   <button class="btn btn-ghost" onclick="doBackup()" title="Baixar backup">↓ Backup</button>
   <label class="btn btn-ghost" style="cursor:pointer" title="Importar backup">↑ Importar<input type="file" accept=".json,application/json" style="display:none" onchange="openImport(event)"></label>
   <button class="btn btn-ghost" id="btnSyncDrive" onclick="syncMenu('drive')" title="Sincronizar com Google Drive">📁 Drive</button>
@@ -712,6 +740,41 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   </div>
 </div></div>
 
+<!-- MODAL: DUPLICADOS -->
+<div class="ov" id="mDup" role="dialog" aria-modal="true"><div class="modal" style="max-width:900px">
+  <button class="mx" onclick="closeM('mDup')" aria-label="Fechar">✕</button>
+  <div class="mtitle">🔗 Detector de Duplicados</div>
+  <div class="dup-tools">
+    <div>
+      <label for="dupThresh" style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600">Limiar de similaridade</label>
+      <select id="dupThresh" onchange="runDupScan()">
+        <option value="0.95">Muito restrito (95% — quase idênticos)</option>
+        <option value="0.85">Restrito (85%)</option>
+        <option value="0.80" selected>Padrão (80%)</option>
+        <option value="0.70">Permissivo (70%)</option>
+        <option value="0.60">Muito permissivo (60% — pode ter falsos positivos)</option>
+      </select>
+    </div>
+    <button class="btn btn-dark" onclick="runDupScan()" id="btnDupScan">🔍 Varrer novamente</button>
+  </div>
+  <div class="dup-info" id="dupInfo"></div>
+  <div id="dupResults"></div>
+  <div class="mfoot">
+    <button class="btn btn-ghost" onclick="closeM('mDup')">Fechar</button>
+  </div>
+</div></div>
+
+<!-- MODAL: AVISO DE DUPLICADO (ao salvar) -->
+<div class="ov" id="mDupWarn" role="dialog" aria-modal="true"><div class="modal" style="max-width:560px">
+  <button class="mx" onclick="cancelDupWarn()" aria-label="Fechar">✕</button>
+  <div class="mtitle" style="color:var(--gd)">⚠ Possível duplicado encontrado</div>
+  <div id="dupWarnBody" style="font-size:13px;color:var(--tx2);line-height:1.7"></div>
+  <div class="mfoot">
+    <button class="btn btn-ghost" onclick="cancelDupWarn()">Cancelar (revisar)</button>
+    <button class="btn btn-blue" id="dupWarnContinue">Salvar assim mesmo</button>
+  </div>
+</div></div>
+
 <!-- MODAL: AJUDA -->
 <div class="ov" id="mHelp" role="dialog" aria-modal="true"><div class="modal" style="max-width:520px">
   <button class="mx" onclick="closeM('mHelp')" aria-label="Fechar">✕</button>
@@ -731,7 +794,7 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   <div style="font-size:13px;color:var(--tx2);line-height:1.7">
     <p><b>Sermonário</b> é um organizador de sermões com busca, filtros, ministrações, exportação (PDF/Word) e consulta bíblica offline + online.</p>
     <p style="margin-top:8px">Os dados ficam salvos <b>localmente</b> no seu navegador. Faça <b>backup</b> regularmente (botão ↓ Backup) ou ative sync com Drive/OneDrive em ⚙ Configurações.</p>
-    <p style="margin-top:8px;font-size:11px;color:var(--tx4);">Versão 10 · Abril 2026</p>
+    <p style="margin-top:8px;font-size:11px;color:var(--tx4);">Versão 9 · Abril 2026</p>
   </div>
   <div class="mfoot">
     <button class="btn btn-blue" onclick="closeM('mHelp')">Entendi</button>
@@ -758,10 +821,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 </script>
 
 <script>
-// ── BANCO BÍBLICO ARC ─
 const ARC={"psalm 23":{"1":"O SENHOR é o meu pastor; nada me faltará.","2":"Ele me faz descansar em pastos verdejantes; leva-me para junto das águas de descanso.","3":"Refrigera a minha alma; guia-me pelas veredas da justiça, por amor do seu nome.","4":"Ainda que eu andasse pelo vale da sombra da morte, não temeria mal algum, porque tu estás comigo; o teu bordão e o teu cajado me consolam.","5":"Preparas uma mesa perante mim na presença dos meus adversários; unges a minha cabeça com óleo; o meu cálice transborda.","6":"Certamente que a bondade e a misericórdia me seguirão todos os dias da minha vida; e habitarei na casa do SENHOR por longos dias."},"psalm 91":{"1":"O que habita no esconderijo do Altíssimo, à sombra do Onipotente descansará.","2":"Direi do SENHOR: Ele é o meu Deus, o meu refúgio, e a minha fortaleza, e nele confiarei.","4":"Com as suas penas te cobrirá, e debaixo das suas asas te refugiarás; a sua verdade é escudo e broquel.","11":"Porque aos seus anjos dará ordem a teu respeito, para te guardarem em todos os teus caminhos.","14":"Pois ele me amou, eu o livrarei; protegê-lo-ei, porque conheceu o meu nome.","15":"Ele me invocará, e eu lhe responderei; na tribulação estarei com ele, livrá-lo-ei e o glorificarei.","16":"Com longura de dias o satisfarei e lhe mostrarei a minha salvação."},"psalm 37":{"4":"Deleita-te também no SENHOR, e ele te concederá o que deseja o teu coração.","5":"Entrega o teu caminho ao SENHOR; confia nele, e ele o fará.","23":"Os passos do homem bom são dirigidos pelo SENHOR; e ele se deleita no seu caminho.","24":"Ainda que caia, não ficará prostrado, porque o SENHOR lhe sustém a mão."},"psalm 40":{"1":"Esperando, esperei no SENHOR; ele se inclinou para mim e ouviu o meu clamor.","2":"Tirou-me de um lago horrível, do lodaçal lamacento, e pôs os meus pés sobre uma rocha, firme nos meus passos."},"psalm 119":{"9":"Como purificará o jovem o seu caminho? Observando-o segundo a tua palavra.","11":"No meu coração escondi as tuas palavras, para não pecar contra ti.","105":"Lâmpada para os meus pés é a tua palavra e luz para o meu caminho.","130":"A revelação das tuas palavras ilumina; dá entendimento aos símplices."},"john 3":{"16":"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.","17":"Porque Deus enviou o seu Filho ao mundo não para condenar o mundo, mas para que o mundo seja salvo por ele."},"john 14":{"1":"Não se turbe o vosso coração; credes em Deus, crede também em mim.","6":"Disse-lhe Jesus: Eu sou o caminho, e a verdade, e a vida; ninguém vem ao Pai senão por mim.","21":"Quem tem os meus mandamentos e os guarda, esse é o que me ama; e quem me ama será amado de meu Pai; e eu o amarei e me manifestarei a ele."},"john 15":{"4":"Ficai em mim e eu ficarei em vós. Como o ramo não pode dar fruto de si mesmo, se não ficar na videira, assim também vós, se não ficardes em mim.","5":"Eu sou a videira, e vós as varas; o que está em mim e eu nele, esse dá muito fruto; porque sem mim nada podeis fazer.","13":"Ninguém tem maior amor do que este: de dar alguém a sua vida pelos seus amigos."},"john 16":{"33":"No mundo tereis aflições; mas tende bom ânimo, eu venci o mundo."},"romans 8":{"1":"Portanto, agora nenhuma condenação há para os que estão em Cristo Jesus.","18":"Porque para mim tenho por certo que as aflições deste tempo presente não são para comparar com a glória que em nós há de ser revelada.","28":"E sabemos que todas as coisas contribuem juntamente para o bem daqueles que amam a Deus, daqueles que são chamados segundo o seu propósito.","31":"Que diremos, pois, acerca destas coisas? Se Deus é por nós, quem será contra nós?","37":"Mas em todas estas coisas somos mais do que vencedores, por meio daquele que nos amou."},"philippians 4":{"4":"Regozijai-vos sempre no Senhor; outra vez digo: Regozijai-vos.","6":"Não andeis ansiosos por coisa alguma; antes as vossas petições sejam em tudo conhecidas diante de Deus pela oração e súplica, com ação de graças.","7":"E a paz de Deus, que excede todo o entendimento, guardará os vossos corações e os vossos pensamentos em Cristo Jesus.","13":"Posso tudo em Cristo que me fortalece.","19":"O meu Deus, segundo as suas riquezas em glória, suprirá todas as vossas necessidades em Cristo Jesus."},"isaiah 40":{"29":"Ele dá forças ao cansado e multiplica as forças ao que não tem nenhum vigor.","31":"Mas os que esperam no SENHOR renovarão as suas forças; subirão com asas como águias; correrão e não se cansarão; caminharão e não se fatigarão."},"jeremiah 29":{"11":"Porque eu sei os pensamentos que tenho a vosso respeito, diz o SENHOR; pensamentos de paz e não de mal, para vos dar o fim que esperais."},"hebrews 11":{"1":"Ora, a fé é o firme fundamento das coisas que se esperam e a prova das coisas que não se veem.","6":"E sem fé é impossível agradar a Deus; porque é necessário que aquele que se aproxima de Deus creia que ele existe, e que é galardoador dos que o buscam."},"joshua 1":{"8":"Não se aparte da tua boca o livro desta lei; antes medita nele dia e noite, para que tenhas cuidado de fazer conforme tudo quanto nele está escrito; porque então farás prosperar o teu caminho.","9":"Sê forte e corajoso; não te atemorizas nem te espantes, porque o SENHOR teu Deus é contigo, por onde quer que andares."},"galatians 6":{"9":"Não nos cansemos de fazer o bem, porque a seu tempo ceifaremos, se não desfalecermos."},"matthew 28":{"18":"E, chegando Jesus, falou-lhes, dizendo: Todo o poder me é dado no céu e na terra.","19":"Portanto, ide, fazei discípulos de todas as nações, batizando-os em nome do Pai, e do Filho, e do Espírito Santo.","20":"Ensinando-os a guardar todas as coisas que eu vos tenho mandado; e eis que eu estou convosco todos os dias, até a consumação dos séculos."},"proverbs 3":{"5":"Confia no SENHOR de todo o teu coração, e não te estribes no teu próprio entendimento.","6":"Reconhece-o em todos os teus caminhos, e ele endireitará as tuas veredas."},"1peter 5":{"7":"Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.","10":"E o Deus de toda a graça, que em Cristo Jesus vos chamou para a sua glória eterna, depois de haverdes sofrido um pouco, ele mesmo vos aperfeiçoará, confirmará, fortificará e estabelecerá."},"acts 12":{"5":"Pedro, pois, estava guardado na prisão; mas a igreja fazia contínua oração por ele a Deus."},"2chronicles 15":{"7":"Mas esforçai-vos e não desfaleçam as vossas mãos, pois há recompensa para o vosso trabalho."},"genesis 1":{"26":"E disse Deus: Façamos o homem à nossa imagem, conforme a nossa semelhança; e domine sobre os peixes do mar, e sobre as aves dos céus, e sobre os animais domésticos, e sobre toda a terra."},"colossians 3":{"3":"Porque morrestes, e a vossa vida está escondida com Cristo em Deus."},"1corinthians 10":{"4":"E todos beberam a mesma bebida espiritual; porque bebiam da pedra espiritual que os seguia; e a pedra era Cristo."},"genesis 19":{"26":"E a mulher de Ló olhou para trás e ficou convertida numa estátua de sal."},"genesis 13":{"9":"Não está toda a terra diante de ti? Aparta-te de mim; se escolheres a esquerda, irei para a direita; e, se à direita escolheres, eu irei para a esquerda."},"genesis 28":{"17":"E temeu e disse: Quão terrível é este lugar! Este não é outro lugar senão a casa de Deus; e esta é a porta dos céus."},"genesis 2":{"7":"E formou o SENHOR Deus o homem do pó da terra e soprou em seus narizes o fôlego da vida; e o homem foi feito alma vivente."},"isaiah 25":{"7":"E destruirá, neste monte, a máscara do rosto com que todos os povos andam cobertos e o véu com que todas as nações se escondem."},"isaiah 41":{"10":"Não temas, porque eu sou contigo; não te assombres, porque eu sou o teu Deus; eu te fortaleço, e te ajudo, e te sustento com a minha destra fiel.","13":"Porque eu, o SENHOR, teu Deus, te tomo pela tua mão direita e te digo: Não temas, que eu te ajudo."},"isaiah 43":{"18":"Não vos lembreis das coisas passadas, nem considereis as antigas.","19":"Eis que farei uma coisa nova, e agora sairá à luz; porventura, não a sabereis? Eis que porei um caminho no deserto e rios no ermo."},"isaiah 60":{"1":"Levanta-te, resplandece, porque já vem a tua luz, e a glória do SENHOR vai nascendo sobre ti."},"luke 17":{"28":"Semelhantemente, como aconteceu nos dias de Ló: comiam, bebiam, compravam, vendiam, plantavam, edificavam.","32":"Lembrai-vos da mulher de Ló."},"luke 24":{"28":"E chegaram à aldeia aonde iam, e ele fez como quem ia para mais longe.","32":"E disseram um ao outro: Não ardia o nosso coração em nós, quando ele nos falava pelo caminho, e quando nos abria as Escrituras?"},"john 8":{"7":"Aquele que dentre vós está sem pecado seja o primeiro que atire pedra contra ela.","11":"E ela disse: Ninguém, Senhor. E disse-lhe Jesus: Nem eu te condeno; vai e não peques mais."},"john 10":{"11":"Eu sou o bom pastor; o bom pastor dá a sua vida pelas ovelhas.","14":"Eu sou o bom pastor; e conheço as minhas ovelhas e sou conhecido delas."},"john 11":{"25":"Disse-lhe Jesus: Eu sou a ressurreição e a vida; quem crê em mim, ainda que esteja morto, viverá.","43":"E, dito isso, clamou em alta voz: Lázaro, vem para fora!"},"matthew 14":{"29":"E ele disse: Vem. E Pedro, descendo do barco, andou sobre as águas para ir ter com Jesus.","31":"Jesus, estendendo logo a mão, o segurou e disse-lhe: Homem de pouca fé, por que duvidaste?"},"matthew 9":{"17":"Ninguém põe vinho novo em odres velhos; de outra maneira, os odres se rompem, e o vinho se derrama, e os odres se perdem; mas põem vinho novo em odres novos, e ambas as coisas se conservam."},"numbers 11":{"4":"E o vulgo que havia entre eles veio a ter grande desejo, e os filhos de Israel tornaram a chorar, dizendo: Quem nos há de dar carne a comer?"},"revelation 3":{"20":"Eis que estou à porta e bato; se alguém ouvir a minha voz e abrir a porta, entrarei em sua casa e com ele cearei, e ele comigo."},"2corinthians 5":{"17":"Assim que, se alguém está em Cristo, nova criatura é; as coisas velhas já passaram; eis que tudo se fez novo."},"2peter 1":{"19":"E temos, mui firme, a palavra dos profetas, à qual bem fazeis em estar atentos, como a uma luz que ilumina em lugar escuro, até que o dia amanheça."},"philippians 3":{"13":"Irmãos, eu ainda não me considero como tendo alcançado; mas uma coisa faço: esquecendo-me das coisas que atrás ficam e avançando para as que estão adiante.","14":"Prossigo para o alvo, para o prêmio da soberana vocação de Deus em Cristo Jesus."},"acts 2":{"42":"E perseveravam na doutrina dos apóstolos, e na comunhão, e no partir do pão, e nas orações."},"hebrews 12":{"2":"Olhando para Jesus, autor e consumador da fé, o qual, pelo gozo que lhe estava proposto, suportou a cruz, desprezando a afronta, e assentou-se à destra do trono de Deus."},"ephesians 5":{"8":"Porque noutro tempo éreis trevas, mas agora sois luz no Senhor; andai como filhos da luz."},"malachi 3":{"18":"Então voltareis e vereis a diferença entre o justo e o ímpio; entre o que serve a Deus e o que não o serve."},"joel 2":{"26":"E comereis abundantemente e vos fartareis, e louvareis o nome do SENHOR, vosso Deus, que fez maravilhas convosco; e o meu povo nunca mais será envergonhado."},"exodus 14":{"14":"O SENHOR pelejará por vós, e vós estareis quietos."},"psalm 4":{"8":"Em paz me deitarei e dormirei, porque só tu, SENHOR, me fazes habitar em segurança."},"psalm 66":{"5":"Vinde e vede as obras de Deus; ele é terrível em seus feitos para com os filhos dos homens."},"psalm 139":{"14":"Render-te-ei graças, porque de um modo terrível e maravilhoso me formaste; maravilhosas são as tuas obras, e a minha alma o sabe muito bem."},"psalm 77":{"10":"E eu disse: Esta é a minha fraqueza, mas lembrarei os anos da destra do Altíssimo."},"psalm 115":{"1":"Não a nós, SENHOR, não a nós, mas ao teu nome dá glória, por amor da tua benignidade e da tua verdade."},"psalm 32":{"1":"Bem-aventurado aquele cuja transgressão é perdoada e cujo pecado é coberto.","2":"Bem-aventurado o homem a quem o SENHOR não imputa iniquidade e em cujo espírito não há engano."},"isaiah 53":{"10":"Mas ao SENHOR agradou moê-lo e afligi-lo; quando a sua alma se puser como oferta pelo pecado, verá a sua posteridade, prolongará os seus dias."},"micah 5":{"2":"E tu, Belém Efratá, posto que pequena entre os milhares de Judá, de ti me sairá o que há de reinar em Israel, cujas saídas são desde o tempo antigo, desde os dias da eternidade."},"mark 9":{"7":"E houve uma nuvem que os cobriu com a sua sombra; e veio uma voz da nuvem, dizendo: Este é o meu Filho amado; a ele ouvi."},"ezekiel 18":{"4":"Eis que todas as almas são minhas; como a alma do pai, assim a alma do filho é minha; a alma que pecar, essa morrerá."}};
 
-// ── SEED ─
 const SEED = [
   {id:'jo1',title:'As Lutas e o Egoísmo Humano',ref:'Jó 3',theme:'Série: Livro de Jó',type:'Expositivo',date:'',url:'https://docs.google.com/document/d/1r95OOyhmjmTUXZTvqB2fAdJPisUlESw8G8W0CXKw-Dw/edit',m:0,log:[],outline:'I. Discurso de Jó após 7 dias de silêncio — amaldiçoa sua vida, não a Deus\nII. 3.3-10 — Maldição focada no passado\nIII. 3.11 — O desejo de ser natimorto\nIV. Cuidado com o egoísmo em meio às lutas (Jonas 4.8)\nV. 3.23 — Aqueles que estão no Caminho (At 9.2)'},
   {id:'jo2',title:'Elifaz e a Doutrina da Retribuição',ref:'Jó 4-5',theme:'Série: Livro de Jó',type:'Expositivo',date:'',url:'',m:0,log:[],outline:'I. 4.1 — Elifaz, o mais velho dos amigos, fala primeiro\nII. 4.2 — Cuidado com conclusões precipitadas\nIII. 4.8 — A Doutrina da Retribuição\nIV. Gl 6.1,3,7 — O defeito que notamos nos outros pode estar em nós\nV. Lc 13.1-3 — Quem é mais pecador?'},
@@ -1282,7 +1343,7 @@ function openEdit(id){
   setTimeout(()=>document.getElementById('fTit').focus(), 100);
 }
 
-function saveS(){
+async function saveS(){
   const title = document.getElementById('fTit').value.trim();
   const ref = document.getElementById('fRef').value.trim();
   if(!title || !ref){ toast('Preencha título e texto bíblico.','err'); return; }
@@ -1302,6 +1363,14 @@ function saveS(){
     url,
     _updated: Date.now()
   };
+
+  // Verificar duplicados antes de salvar (só se tem esboço OU título longo)
+  // Pula a checagem se o usuário está apenas editando pequenas mudanças (mesmo ID)
+  if(data.outline.length > 20 || data.title.length > 8){
+    const proceed = await checkDupBeforeSave(data, editId);
+    if(!proceed) return;  // usuário cancelou pra revisar
+  }
+
   if(editId){
     const i = SS.findIndex(x => x.id === editId);
     if(i >= 0){
@@ -3049,6 +3118,350 @@ function renderTimeChart(byMonth){
       ${xLabels}
     </svg>
     <div style="font-size:10px;color:var(--tx4);text-align:center;margin-top:4px">${total} ministração${total!==1?'ões':''} registrada${total!==1?'s':''} em ${filled.length} ${filled.length!==1?'meses':'mês'}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── DETECTOR DE DUPLICADOS ────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+
+// Normaliza texto para comparação: remove acentos, pontuação, numerais romanos,
+// bullets, converte para lowercase, remove excesso de espaços
+function normalizeForCompare(text){
+  if(!text) return '';
+  return text
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // remove acentos
+    .toLowerCase()
+    .replace(/\b[ivxlcdm]+\.\s*/g, ' ')                // remove numerais romanos (I., II., etc)
+    .replace(/\b\d+[\.\)]\s*/g, ' ')                   // remove numeração (1., 2), etc)
+    .replace(/[•●○\-*→►▪▫◦‣⁃]\s*/g, ' ')             // remove bullets
+    .replace(/[^\w\s]/g, ' ')                          // remove pontuação
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Extrai "shingles" (grupos de N palavras) do texto
+function shingles(text, n){
+  if(!text) return new Set();
+  const words = text.split(/\s+/).filter(w => w.length >= 2);  // ignora palavras de 1 letra
+  if(words.length < n) return new Set(words);
+  const result = new Set();
+  for(let i = 0; i <= words.length - n; i++){
+    result.add(words.slice(i, i + n).join(' '));
+  }
+  return result;
+}
+
+// Similaridade de Jaccard entre dois conjuntos
+function jaccard(setA, setB){
+  if(!setA.size && !setB.size) return 1;
+  if(!setA.size || !setB.size) return 0;
+  let inter = 0;
+  for(const x of setA) if(setB.has(x)) inter++;
+  const union = setA.size + setB.size - inter;
+  return union > 0 ? inter / union : 0;
+}
+
+// Calcula similaridade entre dois sermões combinando título + ref + esboço
+function sermonSimilarity(a, b){
+  // Peso: esboço 70%, título 20%, ref 10%
+  const aOut = shingles(normalizeForCompare(a.outline || ''), 3);
+  const bOut = shingles(normalizeForCompare(b.outline || ''), 3);
+  const aTit = shingles(normalizeForCompare(a.title || ''), 2);
+  const bTit = shingles(normalizeForCompare(b.title || ''), 2);
+  const aRef = normalizeForCompare(a.ref || '').replace(/\s/g, '');
+  const bRef = normalizeForCompare(b.ref || '').replace(/\s/g, '');
+
+  const simOut = jaccard(aOut, bOut);
+  const simTit = jaccard(aTit, bTit);
+  const simRef = aRef && bRef && aRef === bRef ? 1 : (aRef && bRef ? 0 : 0.5);
+
+  // Se esboços estão vazios em ambos, usa só título
+  if(!aOut.size && !bOut.size){
+    return simTit;
+  }
+
+  return simOut * 0.7 + simTit * 0.2 + simRef * 0.1;
+}
+
+// Varre SS e retorna grupos de sermões duplicados
+function findAllDuplicates(threshold){
+  const thresh = threshold || 0.8;
+  const groups = [];    // array de arrays
+  const seen = new Set();
+
+  for(let i = 0; i < SS.length; i++){
+    if(seen.has(i)) continue;
+    const group = [i];
+    for(let j = i + 1; j < SS.length; j++){
+      if(seen.has(j)) continue;
+      const sim = sermonSimilarity(SS[i], SS[j]);
+      if(sim >= thresh){
+        group.push(j);
+        seen.add(j);
+      }
+    }
+    if(group.length > 1){
+      seen.add(i);
+      // Calcular a similaridade média do grupo
+      let simSum = 0, count = 0;
+      for(let a = 0; a < group.length; a++){
+        for(let b = a + 1; b < group.length; b++){
+          simSum += sermonSimilarity(SS[group[a]], SS[group[b]]);
+          count++;
+        }
+      }
+      const avgSim = count > 0 ? simSum / count : 1;
+      groups.push({indices: group, avgSim});
+    }
+  }
+
+  return groups;
+}
+
+// Procura duplicatas para UM sermão específico (usado ao salvar)
+function findDuplicatesOf(sermon, excludeId, threshold){
+  const thresh = threshold || 0.8;
+  const matches = [];
+  for(let i = 0; i < SS.length; i++){
+    if(excludeId && SS[i].id === excludeId) continue;
+    const sim = sermonSimilarity(sermon, SS[i]);
+    if(sim >= thresh){
+      matches.push({index: i, sim});
+    }
+  }
+  return matches.sort((a,b) => b.sim - a.sim);
+}
+
+// Mescla N sermões em um só (mantém o mais completo e absorve dados únicos)
+function mergeSermons(indices){
+  if(!indices || indices.length < 2) return null;
+  const items = indices.map(i => SS[i]);
+  // Escolher o mais completo como "base": mais campos preenchidos + esboço mais longo
+  function completeness(s){
+    let score = 0;
+    if(s.title) score += 10;
+    if(s.ref) score += 8;
+    if(s.theme) score += 4;
+    if(s.date) score += 3;
+    if(s.type && s.type !== 'Expositivo') score += 2;
+    if(s.url) score += 5;
+    score += Math.min(50, (s.outline || '').length / 20);  // Até 50 pontos por tamanho de esboço
+    return score;
+  }
+  items.sort((a, b) => completeness(b) - completeness(a));
+  const base = {...items[0]};  // cópia
+  const others = items.slice(1);
+
+  // Absorver dados: preenche campos vazios da base com valores dos outros
+  others.forEach(o => {
+    if(!base.theme && o.theme) base.theme = o.theme;
+    if(!base.date && o.date) base.date = o.date;
+    if(!base.url && o.url) base.url = o.url;
+    if(!base.ref && o.ref) base.ref = o.ref;
+    // Esboço: se base tem muito menos, anexar o maior
+    if((base.outline || '').length < (o.outline || '').length * 0.5){
+      base.outline = o.outline;
+    }
+  });
+
+  // Somar ministrações e mesclar logs (removendo duplicatas)
+  base.m = items.reduce((sum, s) => sum + (s.m || 0), 0);
+  const allLogs = [];
+  items.forEach(s => {
+    if(Array.isArray(s.log)) s.log.forEach(l => {
+      if(!allLogs.includes(l)) allLogs.push(l);
+    });
+  });
+  base.log = allLogs;
+
+  base._updated = Date.now();
+
+  return base;
+}
+
+// Aplica mesclagem: substitui todos os sermões do grupo pelo mesclado
+function applyMerge(indices){
+  const merged = mergeSermons(indices);
+  if(!merged) return false;
+  // Remover todos os sermões do grupo (em ordem decrescente para não bagunçar índices)
+  const sorted = [...indices].sort((a,b) => b - a);
+  sorted.forEach(i => SS.splice(i, 1));
+  // Adicionar o mesclado no início
+  SS.unshift(merged);
+  save();
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── UI: MODAL DE DUPLICADOS ───────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+function openDupFinder(){
+  openM('mDup');
+  setTimeout(runDupScan, 50);
+}
+
+function runDupScan(){
+  const thresh = parseFloat(document.getElementById('dupThresh').value);
+  const info = document.getElementById('dupInfo');
+  const out = document.getElementById('dupResults');
+  info.textContent = '⏳ Analisando ' + SS.length + ' sermões…';
+  out.innerHTML = '';
+
+  // Usa setTimeout pra não travar a UI em coleções grandes
+  setTimeout(() => {
+    const groups = findAllDuplicates(thresh);
+
+    if(!groups.length){
+      info.innerHTML = '✅ <b>Nenhum duplicado encontrado</b> com o limiar atual. Seus ' + SS.length + ' sermões são únicos.';
+      out.innerHTML = '<div class="dup-empty"><div class="dup-empty-i">✨</div><div>Coleção limpa!</div></div>';
+      return;
+    }
+
+    const totalDup = groups.reduce((a,g) => a + g.indices.length, 0);
+    info.innerHTML = '🔍 Encontrado(s) <b>' + groups.length + ' grupo(s)</b> de duplicados · <b>' + totalDup + ' sermões</b> envolvidos · Limiar: ' + Math.round(thresh*100) + '%';
+
+    out.innerHTML = groups.map((g, gi) => {
+      const items = g.indices.map(i => SS[i]);
+      // Identificar o "mais completo" no grupo
+      const scored = items.map((s, k) => ({s, k, score: completenessScore(s)}));
+      scored.sort((a, b) => b.score - a.score);
+      const mostCompleteIdx = scored[0].k;
+
+      const itemsHtml = items.map((s, k) => {
+        const dt = s.date ? new Date(s.date+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+        const outPrev = (s.outline || '(sem esboço)').split('\n').slice(0, 3).join('\n');
+        return `<div class="dup-item ${k === mostCompleteIdx ? 'most-complete' : ''}">
+          <div class="dup-item-title">${esc(s.title)}</div>
+          <div class="dup-item-meta">
+            <span>✦ <b>${esc(s.ref)}</b></span>
+            <span>${esc(s.type || '—')}</span>
+            <span>${esc(s.theme || '—')}</span>
+            <span>${dt}</span>
+            <span>📊 ${s.m || 0}x</span>
+            ${s.url ? '<span>🔗 link</span>' : ''}
+            <span style="color:var(--tx4)">${(s.outline||'').length} chars</span>
+          </div>
+          <div class="dup-item-outline">${esc(outPrev)}</div>
+          <div class="dup-item-acts">
+            <button onclick="closeM('mDup');setTimeout(()=>openView('${esc(s.id)}'),200)">👁 Ver completo</button>
+            <button onclick="closeM('mDup');setTimeout(()=>openEdit('${esc(s.id)}'),200)">✎ Editar</button>
+            <button class="danger" onclick="dupDeleteOne(${g.indices[k]}, ${gi})">🗑 Excluir só este</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `<div class="dup-group" data-group="${gi}">
+        <div class="dup-group-head">
+          <div>
+            <span class="dup-sim-badge">${Math.round(g.avgSim * 100)}% similar</span>
+            <span style="margin-left:8px;color:var(--tx3);font-size:12px">Grupo ${gi+1} · ${items.length} sermões</span>
+          </div>
+        </div>
+        <div class="dup-items">${itemsHtml}</div>
+        <div class="dup-group-acts">
+          <button class="btn-merge" onclick="dupMergeGroup(${gi})">⚡ Mesclar todos automaticamente (preserva o mais completo)</button>
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="dupDismissGroup(${gi})">✕ Ignorar (não são duplicados)</button>
+        </div>
+      </div>`;
+    }).join('');
+  }, 10);
+}
+
+function completenessScore(s){
+  let score = 0;
+  if(s.title) score += 10;
+  if(s.ref) score += 8;
+  if(s.theme) score += 4;
+  if(s.date) score += 3;
+  if(s.type && s.type !== 'Expositivo') score += 2;
+  if(s.url) score += 5;
+  score += Math.min(50, (s.outline || '').length / 20);
+  return score;
+}
+
+let dupDismissedGroups = new Set();
+let dupLastScan = [];
+
+function dupMergeGroup(groupIndex){
+  // Reexecuta varredura para pegar índices atuais (SS pode ter mudado)
+  const thresh = parseFloat(document.getElementById('dupThresh').value);
+  const groups = findAllDuplicates(thresh);
+  if(!groups[groupIndex]){ toast('Grupo não encontrado. Varra novamente.','err'); return; }
+  const g = groups[groupIndex];
+  const titles = g.indices.map(i => SS[i].title).slice(0, 3).join(', ') + (g.indices.length > 3 ? '…' : '');
+  if(!confirm(`Mesclar ${g.indices.length} sermões em um só?\n\n${titles}\n\nO mais completo será preservado. Dados únicos (temas, links, datas, ministrações) dos outros serão absorvidos. Essa ação pode ser desfeita restaurando um backup anterior.`)){
+    return;
+  }
+  if(applyMerge(g.indices)){
+    toast('✓ ' + g.indices.length + ' sermões mesclados','ok');
+    render();
+    runDupScan();  // Re-scan
+  }
+}
+
+function dupDeleteOne(index, groupIndex){
+  const s = SS[index];
+  if(!s) return;
+  if(!confirm(`Excluir "${s.title}"?\n\nEssa ação não pode ser desfeita (exceto restaurando backup).`)) return;
+  SS.splice(index, 1);
+  save();
+  render();
+  toast('Removido.','ok');
+  runDupScan();
+}
+
+function dupDismissGroup(groupIndex){
+  // Remove o grupo visual da tela apenas (não marca permanentemente)
+  const groupEl = document.querySelector(`.dup-group[data-group="${groupIndex}"]`);
+  if(groupEl) groupEl.style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ── AVISO AO SALVAR ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// Hook que interceta saveS ANTES de gravar. Se achar duplicado com >=80%,
+// mostra modal pedindo confirmação.
+
+let pendingSaveAction = null;
+
+function checkDupBeforeSave(data, editingId){
+  // Chamar antes de efetivamente salvar no SS
+  const fakeSermon = {...data};
+  const matches = findDuplicatesOf(fakeSermon, editingId, 0.80);
+  if(!matches.length) return Promise.resolve(true);  // sem duplicados, prossegue
+
+  // Mostrar aviso
+  return new Promise((resolve) => {
+    const top = matches.slice(0, 3);
+    const body = `
+      <p>Este sermão tem <b>alta similaridade</b> com ${matches.length === 1 ? 'outro já cadastrado' : matches.length + ' sermões já cadastrados'}:</p>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto">
+      ${top.map(m => {
+        const s = SS[m.index];
+        return `<div style="background:var(--sf2);border:1px solid var(--bd2);border-radius:8px;padding:10px">
+          <div style="font-weight:700;color:var(--tx);font-size:13px">${esc(s.title)}</div>
+          <div style="font-size:11px;color:var(--ac);font-style:italic;margin:3px 0">${esc(s.ref)}</div>
+          <div style="font-size:11px;color:var(--tx4)">${esc(s.theme || '')} · ${esc(s.type || '')}</div>
+          <div style="margin-top:6px;font-size:11px;color:var(--gd);font-weight:700">${Math.round(m.sim * 100)}% similar</div>
+        </div>`;
+      }).join('')}
+      ${matches.length > 3 ? `<div style="font-size:11px;color:var(--tx4);text-align:center">+ ${matches.length - 3} outro(s)</div>` : ''}
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:var(--tx3)">Você pode revisar antes ou salvar assim mesmo (talvez seja a mesma mensagem pregada em outra ocasião).</p>
+    `;
+    document.getElementById('dupWarnBody').innerHTML = body;
+    document.getElementById('dupWarnContinue').onclick = () => {
+      closeM('mDupWarn');
+      resolve(true);
+    };
+    pendingSaveAction = () => resolve(false);  // usado pelo cancelDupWarn
+    openM('mDupWarn');
+  });
+}
+
+function cancelDupWarn(){
+  closeM('mDupWarn');
+  if(pendingSaveAction){ pendingSaveAction(); pendingSaveAction = null; }
 }
 
 // ═══════════════════════════════════════════════════════════════
