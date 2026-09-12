@@ -1,0 +1,48 @@
+{
+  "name": "Sermonário — Pr. Daniel Marcos",
+  "short_name": "Sermonário",
+  "description": "Organizador de sermões com Bíblia completa offline. AD Belém · Setor 68 · Jandira-SP",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#002147",
+  "theme_color": "#002147",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Novo sermão",
+      "short_name": "Novo",
+      "url": "./?acao=novo",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Abrir a Bíblia",
+      "short_name": "Bíblia",
+      "url": "./?acao=biblia",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
