@@ -451,6 +451,7 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   <button class="btn btn-ghost" onclick="openDupFinder()" title="Encontrar duplicados">🔗 Duplicados</button>
   <button class="btn btn-ghost" onclick="doBackup()" title="Baixar backup">↓ Backup</button>
   <label class="btn btn-ghost" style="cursor:pointer" title="Importar backup">↑ Importar<input type="file" accept=".json,application/json" style="display:none" onchange="openImport(event)"></label>
+  <label class="btn btn-ghost" style="cursor:pointer" title="Importar vários sermões de arquivos Word/texto de uma vez (cria um sermão por arquivo)">📥 Importar docs<input type="file" accept=".txt,.docx,.rtf" multiple style="display:none" onchange="importBatch(event)"></label>
   <button class="btn btn-ghost" id="btnSyncDrive" onclick="syncMenu('drive')" title="Sincronizar com Google Drive">📁 Drive</button>
   <button class="btn btn-ghost" id="btnSyncOD" onclick="syncMenu('onedrive')" title="Sincronizar com OneDrive">☁️ OneDrive</button>
   <button class="btn btn-ghost btn-icon" id="btnTheme" onclick="toggleTheme()" title="Alternar tema" aria-label="Alternar tema claro/escuro">🌙</button>
@@ -2018,6 +2019,124 @@ function importFile(e){
   info.style.color = 'var(--rd)';
   info.textContent = '✗ Formato não suportado. Use .txt, .rtf ou .docx.';
   e.target.value = '';
+}
+
+// ── IMPORTAÇÃO EM LOTE (vários .txt/.docx/.rtf de uma vez) ──
+// Lê um arquivo de sermão e devolve o texto puro (Promise<string>).
+function readSermonText(file){
+  return new Promise((resolve, reject) => {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const r = new FileReader();
+    r.onerror = () => reject(new Error('falha na leitura'));
+
+    if(ext === 'txt' || ext === 'rtf'){
+      r.onload = ev => {
+        let txt = ev.target.result || '';
+        if(ext === 'rtf'){
+          txt = txt
+            .replace(/\\par[d]?\b/g,'\n')
+            .replace(/\\line\b/g,'\n')
+            .replace(/\\'[0-9a-f]{2}/gi,'')
+            .replace(/\\[a-z]+-?[0-9]*\s?/gi,'')
+            .replace(/[{}]/g,'')
+            .replace(/\\/g,'')
+            .replace(/[ \t]+/g,' ')
+            .replace(/\n{3,}/g,'\n\n')
+            .trim();
+        }
+        resolve(txt);
+      };
+      r.readAsText(file, 'UTF-8');
+      return;
+    }
+
+    if(ext === 'docx'){
+      if(typeof JSZip === 'undefined'){ reject(new Error('biblioteca .docx indisponível')); return; }
+      r.onload = ev => {
+        JSZip.loadAsync(ev.target.result).then(zip => {
+          const xmlFile = zip.files['word/document.xml'];
+          if(!xmlFile) throw new Error('.docx inválido ou corrompido');
+          return xmlFile.async('string');
+        }).then(xml => {
+          const txt = xml
+            .replace(/<w:br[^>]*\/?>/gi, '\n')
+            .replace(/<\/w:p>/gi, '\n')
+            .replace(/<w:tab[^>]*\/?>/gi, '\t')
+            .replace(/<[^>]+>/g, '')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&quot;/g, '"')
+            .replace(/&apos;/g, "'")
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
+          resolve(txt);
+        }).catch(reject);
+      };
+      r.readAsArrayBuffer(file);
+      return;
+    }
+
+    if(ext === 'doc'){ reject(new Error('.doc antigo — salve como .docx')); return; }
+    reject(new Error('formato não suportado'));
+  });
+}
+
+async function importBatch(e){
+  const files = [...e.target.files];
+  e.target.value = '';
+  if(!files.length) return;
+
+  if(!confirm(`Importar ${files.length} arquivo(s)?\n\nSerá criado um sermão para cada arquivo, com título, texto bíblico, tipo e esboço preenchidos automaticamente. Você pode revisar e ajustar cada um depois.`)) return;
+
+  toast('⏳ Importando ' + files.length + ' arquivo(s)…');
+
+  let added = 0;
+  const failed = [];
+  const novos = [];
+
+  for(const f of files){
+    try{
+      const txt = await readSermonText(f);
+      if(!txt || !txt.trim()){ failed.push(f.name + ' (vazio)'); continue; }
+      const meta = extractMetadata(txt);
+      const fallbackTitle = f.name.replace(/\.(docx?|txt|rtf)$/i, '').trim();
+      novos.push({
+        id: uid(),
+        title: (meta.title || fallbackTitle || 'Sem título').slice(0, 120),
+        ref: meta.ref || '',
+        theme: meta.theme || '',
+        date: '',
+        type: meta.type || 'Expositivo',
+        outline: meta.outline || txt.trim(),
+        url: '',
+        m: 0,
+        log: [],
+        _created: Date.now(),
+        _updated: Date.now()
+      });
+      added++;
+    }catch(err){
+      failed.push(f.name + ' (' + (err.message || 'erro') + ')');
+    }
+  }
+
+  // Insere os novos no topo, preservando a ordem dos arquivos escolhidos
+  if(novos.length){
+    SS = [...novos.reverse(), ...SS];
+    save();
+    render();
+  }
+
+  if(failed.length){
+    toast('✓ ' + added + ' importado(s). ' + failed.length + ' com problema.','err');
+    alert('Importação concluída.\n\n✓ Importados: ' + added +
+          '\n✗ Com problema (' + failed.length + '):\n• ' + failed.join('\n• ') +
+          '\n\nDica: os que faltaram, revise o formato (use .docx ou .txt) e importe de novo.');
+  }else{
+    toast('✓ ' + added + ' sermão(ões) importado(s)!','ok');
+  }
 }
 
 // ── MINISTRAÇÕES ─────────────────────────────────────
