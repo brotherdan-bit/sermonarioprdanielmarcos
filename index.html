@@ -1813,30 +1813,61 @@ function extractMetadata(text){
   const nonEmpty = lines.filter(l => l.length > 0);
   if(!nonEmpty.length) return out;
 
-  // 1. TÍTULO: primeira linha não-vazia (ou primeira linha que pareça título)
-  // Heurística: linha curta (3-100 chars) que não comece com número romano nem bullet
-  for(const ln of nonEmpty){
-    if(ln.length >= 3 && ln.length <= 120 &&
-       !/^[IVX]+\.\s/.test(ln) &&
-       !/^\d+[\.\)]\s/.test(ln) &&
-       !/^[-•*]\s/.test(ln) &&
-       !/^(introdu[çc][ãa]o|conclus[ãa]o|texto|leitura|ora[çc][ãa]o)/i.test(ln)){
-      // Tira "Título:", "Tema:", "Sermão:" do início
-      out.title = ln.replace(/^(t[íi]tulo|tema|serm[ãa]o|t[óo]pico|assunto)\s*[:\-—–]\s*/i, '').trim();
-      break;
-    }
+  // 1. TÍTULO: procura entre as primeiras linhas, pulando cabeçalho/timbre.
+  // Linhas de cabeçalho comuns nos documentos (igreja, setor, local, data,
+  // nome do pregador, "Sermão"/"Pregação" isolado, nº de página) NÃO são título.
+  const HEADER_SKIP = /^(?:assembl|ad\s+bel[ée]m|igreja\b|congrega[çc][ãa]o|minist[ée]rio\s+(do|de)\b|setor\s*\d*|jandira|francisco\s+morato|barueri|praia\s+grande|bel[ée]m\b|belenzinho|pr\.?\s|pastor\b|preletor|pregador|preg[.:]|ministrante|data\s*[:\-]|local\s*[:\-]|hor[áa]rio|culto\b|serm[ãa]o\s*$|serm[ãa]o\s*[:\-]|prega[çc][ãa]o\s*$|mensagem\s*$|estudo\s*$|p[áa]gina\s*\d+|\d{1,2}\s*[\/.\-]\s*\d{1,2}(?:\s*[\/.\-]\s*\d{2,4})?\s*$)/i;
+  // Uma linha que é basicamente só uma referência bíblica também não é título.
+  const looksLikeRef = ln => {
+    const mm = ln.match(BIB_REF_RE); BIB_REF_RE.lastIndex = 0;
+    if(!mm) return false;
+    return mm.join(' ').replace(/\s/g,'').length >= ln.replace(/\s/g,'').length * 0.6;
+  };
+  const isBadTitle = ln => (
+    ln.length < 3 || ln.length > 120 ||
+    /^[IVX]+[.\-)]\s/.test(ln) ||
+    /^\d+[.\)]\s/.test(ln) ||
+    /^[-•*]\s/.test(ln) ||
+    /^(introdu[çc][ãa]o|conclus[ãa]o|texto|leitura|ora[çc][ãa]o|base|refer[êe]ncia|tema|s[ée]rie|t[óo]pico)\b/i.test(ln) ||
+    HEADER_SKIP.test(ln) ||
+    looksLikeRef(ln)
+  );
+  const candLines = nonEmpty.slice(0, 15);
+  // Preferência: primeira linha TODA MAIÚSCULA perto do topo (estilo do usuário).
+  for(const ln of candLines){
+    if(isBadTitle(ln)) continue;
+    const letters = ln.replace(/[^a-zà-úA-ZÀ-Ú]/g,'');
+    if(letters.length >= 3 && ln === ln.toUpperCase()){ out.title = ln.trim(); break; }
   }
-  // Fallback: primeira linha mesmo
+  // Senão, a primeira linha boa que não seja cabeçalho.
+  if(!out.title){
+    for(const ln of candLines){ if(!isBadTitle(ln)){ out.title = ln; break; } }
+  }
+  // Tira "Título:", "Tema:", "Sermão:" do início
+  out.title = (out.title || '').replace(/^(t[íi]tulo|tema|serm[ãa]o|t[óo]pico|assunto|mensagem)\s*[:\-—–]\s*/i, '').trim();
+  // Fallback final: primeira linha mesmo
   if(!out.title) out.title = nonEmpty[0].slice(0, 120);
 
   // 2. TEXTO BÍBLICO: procura "Texto:", "Base bíblica:", etc, OU primeira referência encontrada
   const refLabelMatch = text.match(/(?:texto[\s-]?(?:base|b[íi]blico)?|base|leitura|refer[êe]ncia)[\s:\-—–]+([^\n]+)/i);
   if(refLabelMatch){
-    // Pega só a parte que parece referência
+    // Pega só a(s) parte(s) que parecem referência
     const candidato = refLabelMatch[1].trim();
-    const m = candidato.match(BIB_REF_RE);
-    if(m && m[0]) out.ref = m[0].trim();
-    else if(candidato.length < 60) out.ref = candidato;
+    const m = candidato.match(BIB_REF_RE); BIB_REF_RE.lastIndex = 0;
+    if(m && m.length){
+      // Junta até 3 referências distintas (ex.: "Mt 21:22; Tg 5:16")
+      out.ref = [...new Set(m.slice(0,3).map(r => r.trim()))].join('; ');
+    }else{
+      // Sem referência reconhecida: limpa a versão bíblica que costuma vir junto
+      // (ex.: "(Almeida Revista e Corrigida)", "— RC", "- ARC", "NVI")
+      const limpo = candidato
+        .replace(/\([^)]*\)/g, '')
+        .replace(/\s*[—–-]\s*(ARC|ACF|NVI|NTLH|ARA|RC|RA|KJV|BKJ|A21|TB)\b.*$/i, '')
+        .replace(/\b(ARC|ACF|NVI|NTLH|ARA|RC|RA|KJV|BKJ|A21|TB)\b\s*$/i, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+      if(limpo && limpo.length < 60) out.ref = limpo;
+    }
   }
   // Fallback: primeira referência bíblica em qualquer lugar (das primeiras 10 linhas)
   if(!out.ref){
