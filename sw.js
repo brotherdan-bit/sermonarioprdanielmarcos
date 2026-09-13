@@ -4,7 +4,7 @@
    quando há rede, baixa a versão nova em segundo plano para a
    próxima abertura. */
 
-const CACHE = 'sermonario-v22';
+const CACHE = 'sermonario-v23';
 const ASSETS = [
   './',
   './index.html',
