@@ -4,7 +4,7 @@
    quando há rede, baixa a versão nova em segundo plano para a
    próxima abertura. */
 
-const CACHE = 'sermonario-v23';
+const CACHE = 'sermonario-v24';
 const ASSETS = [
   './',
   './index.html',
@@ -12,7 +12,8 @@ const ASSETS = [
   './icon-192.png',
   './icon-512.png',
   './icon-maskable.png',
-  './apple-touch-icon.png'
+  './apple-touch-icon.png',
+  './jspdf.umd.min.js'
 ];
 
 self.addEventListener('install', e => {

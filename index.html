@@ -402,6 +402,7 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="shortcut icon" type="image/png" href="icon-192.png">
+<script defer src="jspdf.umd.min.js"></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2257,6 +2258,83 @@ function selExp(t){
   document.getElementById('ePDF').classList.toggle('sel', t === 'pdf');
   document.getElementById('eDOC').classList.toggle('sel', t === 'doc');
 }
+function _clean(t){
+  return (t==null?'':String(t))
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}️•✦]/gu,'')
+    .replace(/[ \t]{2,}/g,' ').trim();
+}
+function buildSermaoPDF(s, iR, iM, iN, ICON, dt){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  const PW = doc.internal.pageSize.getWidth();
+  const PH = doc.internal.pageSize.getHeight();
+  const M = 48, topY = 50, contentBottom = PH - 72;
+  let y = topY;
+
+  // HEADER (ícone + título na mesma linha)
+  const ico = 46;
+  try{ doc.addImage(ICON,'PNG',M,y,ico,ico); }catch(e){}
+  const tx = M + ico + 14, tw = PW - M - tx;
+  let hy = y;
+  const type=_clean(s.type);
+  if(type){
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    const pad=6, bw=doc.getTextWidth(type.toUpperCase())+pad*2, bh=14;
+    doc.setFillColor(0,33,71); doc.roundedRect(tx,hy,bw,bh,6,6,'F');
+    doc.setTextColor(255,255,255); doc.text(type.toUpperCase(), tx+pad, hy+bh-4);
+    hy += bh+7;
+  }
+  doc.setFont('times','bold'); doc.setFontSize(16); doc.setTextColor(0,33,71);
+  const tl=doc.splitTextToSize(_clean(s.title),tw); doc.text(tl,tx,hy+11); hy += tl.length*19+2;
+  if(iR && s.ref){ doc.setFont('times','italic'); doc.setFontSize(11); doc.setTextColor(30,107,191);
+    const rl=doc.splitTextToSize(_clean(s.ref),tw); doc.text(rl,tx,hy); hy += rl.length*14; }
+  if(iM){ const meta=[s.type,s.theme,dt].map(_clean).filter(Boolean).join('   ·   ');
+    if(meta){ doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(110,110,110);
+      const ml=doc.splitTextToSize(meta,tw); doc.text(ml,tx,hy); hy += ml.length*12; } }
+  y = Math.max(y+ico, hy)+14;
+  doc.setDrawColor(0,33,71); doc.setLineWidth(2); doc.line(M,y,PW-M,y); y += 20;
+
+  function ensure(h){ if(y+h>contentBottom){ doc.addPage(); y=topY; } }
+
+  if(s.outline){
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(150,150,150);
+    ensure(14); doc.text('ESBOÇO', M, y); y+=15;
+    doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(51,51,51);
+    const lines=doc.splitTextToSize(_clean(s.outline), PW-M*2); const lh=16;
+    for(const ln of lines){ ensure(lh); doc.text(ln,M,y); y+=lh; }
+  }
+  if(iN && s.log && s.log.length){
+    y+=10; ensure(16);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(150,150,150);
+    doc.text('MINISTRAÇÕES: '+(s.m||0), M, y); y+=15;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(100,100,100);
+    const lg=s.log.slice(0,20);
+    for(let i=0;i<lg.length;i++){ const o=(typeof logObj==='function')?logObj(lg[i]):{d:String(lg[i]),c:''};
+      const txt=(lg.length-i)+'. '+_clean(o.d)+(o.c?'   ·   '+_clean(o.c):'');
+      const wl=doc.splitTextToSize(txt, PW-M*2);
+      for(const ln of wl){ ensure(13); doc.text(ln,M,y); y+=13; } }
+  }
+
+  // WATERMARK + RODAPÉ em todas as páginas
+  const YEAR=new Date().getFullYear();
+  const COPY='© '+YEAR+' Daniel Marcos Ferreira — Todos os direitos reservados. Este sermão é de propriedade do autor; proibida a reprodução ou uso sem autorização prévia.';
+  const SIGN='Sermonário — Pr. Daniel Marcos Ferreira · AD Belém · Setor 68 · Jandira-SP';
+  const total=doc.internal.getNumberOfPages();
+  for(let p=1;p<=total;p++){
+    doc.setPage(p);
+    try{ doc.saveGraphicsState(); doc.setGState(new doc.GState({opacity:0.05}));
+      const ws=310; doc.addImage(ICON,'PNG',(PW-ws)/2,(PH-ws)/2,ws,ws); doc.restoreGraphicsState(); }catch(e){}
+    const fy=PH-48;
+    doc.setDrawColor(228,228,228); doc.setLineWidth(0.5); doc.line(M,fy,PW-M,fy);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(140,140,140);
+    const cl=doc.splitTextToSize(COPY, PW-M*2); let cy=fy+11;
+    for(const ln of cl){ doc.text(ln, PW/2, cy, {align:'center'}); cy+=9; }
+    doc.setFontSize(6.5); doc.setTextColor(180,180,180);
+    doc.text(SIGN, PW/2, cy+2, {align:'center'});
+  }
+  return doc;
+}
+
 function doExp(){
   const s = SS.find(x => x.id === expId);
   if(!s) return;
@@ -2269,13 +2347,15 @@ function doExp(){
   const YEAR = new Date().getFullYear();
   const COPY = `© ${YEAR} Daniel Marcos Ferreira — Todos os direitos reservados. Este sermão é de propriedade do autor; proibida a reprodução ou uso sem autorização prévia.`;
   const SIGN = `Sermonário — Pr. Daniel Marcos Ferreira · AD Belém · Setor 68 · Jandira-SP`;
-  const body = `<div style="border-bottom:3px solid #002147;padding-bottom:14px;margin-bottom:18px">
-    <img src="${ICON}" alt="" style="width:40px;height:40px;display:block;margin-bottom:8px" />
-    <div style="display:inline-block;background:#002147;color:#fff;font-size:10px;padding:2px 10px;border-radius:12px;margin-bottom:6px">${esc(s.type||'')}</div>
-    <h1 style="font-family:Georgia,serif;font-size:20px;color:#002147;margin:0 0 5px">${esc(s.title)}</h1>
-    ${iR && s.ref ? `<div style="color:#1e6bbf;font-style:italic;font-size:13px;margin-bottom:6px">✦ ${esc(s.ref)}</div>` : ''}
-    ${iM ? `<div style="font-size:11px;color:#666">${[s.type, s.theme, dt].filter(Boolean).map(esc).join(' · ')}</div>` : ''}
-  </div>
+  const body = `<table style="width:100%;border-collapse:collapse;border-bottom:3px solid #002147;margin-bottom:18px"><tr>
+    <td style="width:58px;vertical-align:middle;padding:0 14px 14px 0"><img src="${ICON}" alt="" style="width:50px;height:50px;display:block" /></td>
+    <td style="vertical-align:middle;padding-bottom:14px">
+      <div style="display:inline-block;background:#002147;color:#fff;font-size:10px;padding:2px 10px;border-radius:12px;margin-bottom:6px">${esc(s.type||'')}</div>
+      <h1 style="font-family:Georgia,serif;font-size:20px;color:#002147;margin:0 0 5px">${esc(s.title)}</h1>
+      ${iR && s.ref ? `<div style="color:#1e6bbf;font-style:italic;font-size:13px;margin-bottom:6px">✦ ${esc(s.ref)}</div>` : ''}
+      ${iM ? `<div style="font-size:11px;color:#666">${[s.type, s.theme, dt].filter(Boolean).map(esc).join(' · ')}</div>` : ''}
+    </td>
+  </tr></table>
   ${s.outline ? `<div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#999;margin-bottom:8px;border-top:1px solid #eee;padding-top:10px">Esboço</div><div style="font-size:13px;line-height:1.9;color:#333;white-space:pre-wrap">${esc(s.outline)}</div>` : ''}
   ${iN && s.log?.length ? `<div style="margin-top:14px;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#999;border-top:1px solid #eee;padding-top:10px">Ministrações: ${s.m||0}</div>${s.log.slice(0,20).map((d,i)=>`<div style="font-size:12px;color:#666;padding:3px 0;border-bottom:1px solid #f0f0f0">${s.log.length-i}. ${esc(logObj(d).d)}${logObj(d).c?" · "+esc(logObj(d).c):""}</div>`).join('')}` : ''}`;
 
@@ -2285,10 +2365,17 @@ function doExp(){
     .replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_').toLowerCase() || 'sermao';
 
   if(expType === 'pdf'){
-    const w = window.open('', '_blank', 'width=750,height=900');
-    if(!w){ toast('Bloqueador de pop-ups impediu a abertura.','err'); return; }
-    w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${esc(s.title)}</title><style>@page{margin:1.5cm 1.6cm}body{font-family:Tahoma,sans-serif;color:#333;margin:0}.wrap{max-width:680px;margin:0 auto}.wm{position:fixed;top:50%;left:50%;width:56%;max-width:390px;transform:translate(-50%,-50%) rotate(-28deg);opacity:.06;z-index:0;pointer-events:none}table.doc{width:100%;border-collapse:collapse;position:relative;z-index:1}table.doc td{padding:0}tfoot .pf{text-align:center;font-size:8.5px;color:#8a8a8a;line-height:1.5;border-top:1px solid #eee;padding-top:6px;margin-top:14px}tfoot .pf .sg{font-size:8px;color:#bcbcbc;margin-top:2px}</style></head><body><img class="wm" src="${ICON}" alt="" /><div class="wrap"><table class="doc"><tfoot><tr><td><div class="pf">${COPY}<div class="sg">${SIGN}</div></div></td></tr></tfoot><tbody><tr><td>${body}</td></tr></tbody></table></div><script>window.onload=function(){setTimeout(function(){window.print()},400)}<\/script></body></html>`);
-    w.document.close();
+    try{
+      if(!(window.jspdf && window.jspdf.jsPDF)){ toast('Biblioteca de PDF ainda carregando, tente de novo.','err'); return; }
+      const doc = buildSermaoPDF(s, iR, iM, iN, ICON, dt);
+      const blob = doc.output('blob');
+      const file = new File([blob], baseName + '.pdf', {type:'application/pdf'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file], title: s.title}).then(()=>toast('Pronto para compartilhar!','ok')).catch(()=>{});
+      } else {
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=baseName+'.pdf'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); toast('PDF salvo!','ok');
+      }
+    }catch(err){ toast('Erro ao gerar PDF: '+err.message,'err'); return; }
   }else{
     const doc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${esc(s.title)}</title><style>@page Section1{size:595.3pt 841.9pt;margin:2cm 2cm 2.4cm;mso-footer:f1}div.Section1{page:Section1}body{font-family:Tahoma,sans-serif;font-size:12pt;color:#333}p.MsoFooter{font-size:7.5pt;color:#999;text-align:center;margin:0;line-height:1.4}</style></head><body><div class=Section1>${body}<div style='mso-element:footer' id=f1><p class=MsoFooter>${COPY}<br>${SIGN}</p></div></div></body></html>`;
     const a = document.createElement('a');
