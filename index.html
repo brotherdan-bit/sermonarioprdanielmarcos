@@ -646,7 +646,7 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
   <div style="font-size:12px;color:var(--tx4);font-style:italic;margin-bottom:12px" id="mExpTtl"></div>
   <div class="eopts">
     <div class="eopt sel" id="ePDF" onclick="selExp('pdf')" tabindex="0"><div class="eopt-i">📄</div><div class="eopt-n">PDF</div><div class="eopt-d">Imprimir / compartilhar</div></div>
-    <div class="eopt" id="eDOC" onclick="selExp('doc')" tabindex="0"><div class="eopt-i">📝</div><div class="eopt-n">Word (.doc)</div><div class="eopt-d">Editar no computador</div></div>
+    <div class="eopt" id="eDOC" onclick="selExp('doc')" tabindex="0"><div class="eopt-i">📝</div><div class="eopt-n">Word (.docx)</div><div class="eopt-d">Editar no computador</div></div>
   </div>
   <div class="field"><label>Incluir</label>
     <div class="echk">
@@ -2350,6 +2350,43 @@ function buildSermaoPDF(s, iR, iM, iN, ICON, dt){
   return doc;
 }
 
+async function buildSermaoDOCX(s, iR, iM, iN, dt){
+  var Z=window.JSZip; if(!Z) throw new Error('Biblioteca ZIP indisponível');
+  var YEAR=new Date().getFullYear();
+  var COPY='© '+YEAR+' Daniel Marcos Ferreira — Todos os direitos reservados. Este sermão é de propriedade do autor; proibida a reprodução ou uso sem autorização prévia.';
+  var SIGN='Sermonário — Pr. Daniel Marcos Ferreira · AD Belém · Setor 68 · Jandira-SP';
+  function xesc(t){return (t==null?'':String(t)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function P(text,o){o=o||{};var rpr='<w:rPr>'+(o.bold?'<w:b/>':'')+(o.italic?'<w:i/>':'')+'<w:sz w:val="'+(o.size||22)+'"/>'+(o.color?'<w:color w:val="'+o.color+'"/>':'')+'</w:rPr>';var ppr=o.align?'<w:pPr><w:jc w:val="'+o.align+'"/></w:pPr>':'';return '<w:p>'+ppr+'<w:r>'+rpr+'<w:t xml:space="preserve">'+xesc(_clean(text))+'</w:t></w:r></w:p>';}
+  var bd=P(s.title,{bold:true,size:32,color:'002147'});
+  if(iR && s.ref) bd+=P(s.ref,{italic:true,size:22,color:'1E6BBF'});
+  if(iM){var meta=[s.type,s.theme,dt].filter(Boolean).join('  ·  ');if(meta)bd+=P(meta,{size:18,color:'666666'});}
+  bd+='<w:p/>';
+  (s.outline||'').split('\n').forEach(function(line){
+    var t=line.replace(/\s+$/,'');
+    if(!t){bd+='<w:p/>';return;}
+    var up=t===t.toUpperCase() && /[A-ZÀ-Ý]/.test(t) && t.length<80;
+    var head=/^[IVXLC]+\.\s/.test(t) || up;
+    bd+=P(t,{bold:head,size:22,color:head?'002147':'333333'});
+  });
+  if(iN && s.log && s.log.length){
+    bd+='<w:p/>'+P('MINISTRAÇÕES: '+(s.m||0),{bold:true,size:18,color:'666666'});
+    s.log.slice(0,20).forEach(function(d,i){var o=(typeof logObj==='function')?logObj(d):{d:String(d),c:''};bd+=P((s.log.length-i)+'. '+o.d+(o.c?'  ·  '+o.c:''),{size:19,color:'666666'});});
+  }
+  var sect='<w:sectPr><w:footerReference w:type="default" r:id="rId1"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1418" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>';
+  var docxml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>'+bd+sect+'</w:body></w:document>';
+  var ftr='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="14"/><w:color w:val="8A8A8A"/></w:rPr><w:t xml:space="preserve">'+xesc(COPY)+'</w:t></w:r></w:p><w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="13"/><w:color w:val="B0B0B0"/></w:rPr><w:t xml:space="preserve">'+xesc(SIGN)+'</w:t></w:r></w:p></w:ftr>';
+  var ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>';
+  var rels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+  var drels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>';
+  var zip=new Z();
+  zip.file('[Content_Types].xml',ct);
+  zip.file('_rels/.rels',rels);
+  zip.file('word/document.xml',docxml);
+  zip.file('word/_rels/document.xml.rels',drels);
+  zip.file('word/footer1.xml',ftr);
+  return await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+}
+
 function doExp(){
   const s = SS.find(x => x.id === expId);
   if(!s) return;
@@ -2392,13 +2429,15 @@ function doExp(){
       }
     }catch(err){ toast('Erro ao gerar PDF: '+err.message,'err'); return; }
   }else{
-    const doc = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${esc(s.title)}</title><style>@page Section1{size:595.3pt 841.9pt;margin:2cm 2cm 2.4cm;mso-footer:f1}div.Section1{page:Section1}body{font-family:Tahoma,sans-serif;font-size:12pt;color:#333}p.MsoFooter{font-size:7.5pt;color:#999;text-align:center;margin:0;line-height:1.4}</style></head><body><div class=Section1>${body}<div style='mso-element:footer' id=f1><p class=MsoFooter>${COPY}<br>${SIGN}</p></div></div></body></html>`;
-    const a = document.createElement('a');
-    const blob = new Blob(['\ufeff' + doc], {type: 'application/msword'});
-    a.href = URL.createObjectURL(blob);
-    a.download = baseName + '.doc';
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+    if(!window.JSZip){ toast('Biblioteca ainda carregando, tente de novo.','err'); return; }
+    buildSermaoDOCX(s, iR, iM, iN, dt).then(function(blob){
+      var file=new File([blob], baseName+'.docx', {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file], title:s.title}).then(function(){toast('Pronto para compartilhar!','ok');}).catch(function(){});
+      } else {
+        var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=baseName+'.docx'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href);},1500); toast('Word salvo!','ok');
+      }
+    }).catch(function(err){ toast('Erro ao gerar Word: '+err.message,'err'); });
   }
   closeM('mExp');
   toast('Exportado!','ok');
