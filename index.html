@@ -446,26 +446,80 @@ mark{background:var(--hl);color:inherit;padding:0 2px;border-radius:3px;}
     <option value="recent">Editados recentemente</option>
   </select>
   <div class="sep"></div>
-  <button class="btn btn-blue" onclick="openEdit()" title="Novo sermão (N)">＋ Novo</button>
+  <button class="btn btn-blue owner-only" onclick="openEdit()" title="Novo sermão (N)">＋ Novo</button>
   <button class="btn btn-dark" onclick="openBible()" title="Bíblia (B)">📖 Bíblia</button>
   <button class="btn btn-ghost" onclick="openBusca()" title="Onde usei este texto?">🔎 Onde usei</button>
   <button class="btn btn-ghost" onclick="openCongs()" title="Congregações">⛪ Congregações</button>
   <button class="btn btn-dark" id="btnInstall" onclick="instalarApp()" style="display:none">⬇ Instalar app</button>
   <button class="btn btn-ghost" onclick="openList()" title="Lista de sermões (L)">📋 Lista</button>
   <button class="btn btn-ghost" onclick="openDashboard()" title="Dashboard (D)">📊 Dashboard</button>
-  <button class="btn btn-ghost" onclick="openDupFinder()" title="Encontrar duplicados">🔗 Duplicados</button>
-  <button class="btn btn-ghost" onclick="doBackup()" title="Baixar backup">↓ Backup</button>
-  <label class="btn btn-ghost" style="cursor:pointer" title="Importar backup">↑ Importar<input type="file" accept=".json,application/json" style="display:none" onchange="openImport(event)"></label>
-  <label class="btn btn-ghost" style="cursor:pointer" title="Importar vários sermões de arquivos Word/texto de uma vez (cria um sermão por arquivo)">📥 Importar docs<input type="file" accept=".txt,.docx,.rtf" multiple style="display:none" onchange="importBatch(event)"></label>
-  <button class="btn btn-ghost" id="btnSyncDrive" onclick="syncMenu('drive')" title="Sincronizar com Google Drive">📁 Drive</button>
-  <button class="btn btn-ghost" id="btnSyncOD" onclick="syncMenu('onedrive')" title="Sincronizar com OneDrive">☁️ OneDrive</button>
+  <button class="btn btn-ghost owner-only" onclick="openDupFinder()" title="Encontrar duplicados">🔗 Duplicados</button>
+  <button class="btn btn-ghost owner-only" onclick="doBackup()" title="Baixar backup">↓ Backup</button>
+  <label class="btn btn-ghost owner-only" style="cursor:pointer" title="Importar backup">↑ Importar<input type="file" accept=".json,application/json" style="display:none" onchange="openImport(event)"></label>
+  <label class="btn btn-ghost owner-only" style="cursor:pointer" title="Importar vários sermões de arquivos Word/texto de uma vez (cria um sermão por arquivo)">📥 Importar docs<input type="file" accept=".txt,.docx,.rtf" multiple style="display:none" onchange="importBatch(event)"></label>
+  <button class="btn btn-ghost owner-only" id="btnSyncDrive" onclick="syncMenu('drive')" title="Sincronizar com Google Drive">📁 Drive</button>
+  <button class="btn btn-ghost owner-only" id="btnSyncOD" onclick="syncMenu('onedrive')" title="Sincronizar com OneDrive">☁️ OneDrive</button>
   <button class="btn btn-ghost btn-icon" id="btnTheme" onclick="toggleTheme()" title="Alternar tema" aria-label="Alternar tema claro/escuro">🌙</button>
-  <button class="btn btn-ghost btn-icon" onclick="openSettings()" title="Configurações" aria-label="Configurações">⚙</button>
+  <button class="btn btn-ghost btn-icon owner-only" onclick="openSettings()" title="Configurações" aria-label="Configurações">⚙</button>
   <button class="btn btn-ghost btn-icon" onclick="openM('mHelp')" title="Ajuda (?)" aria-label="Ajuda">?</button>
+  <button class="btn btn-ghost btn-icon" onclick="lockApp()" title="Bloquear / trocar usuário" aria-label="Bloquear">🔒</button>
 </div></div>
 
+<!-- LOGIN GATE -->
+<style>
+#loginGate{position:fixed;inset:0;z-index:99999;background:#002147;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:Tahoma,system-ui,sans-serif;padding:24px}
+#loginGate .lg-card{width:100%;max-width:320px;text-align:center}
+#loginGate img{width:84px;height:84px;margin-bottom:14px;border-radius:18px}
+#loginGate h1{font-size:22px;margin:0 0 4px;font-weight:bold}
+#loginGate p{font-size:12px;color:#b9c4d6;margin:0 0 18px}
+#loginGate input{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:10px;border:1px solid #33507a;background:#0a2b52;color:#fff;font-size:16px;margin-bottom:10px}
+#loginGate button{width:100%;padding:12px;border:0;border-radius:10px;background:#e6a417;color:#002147;font-weight:bold;font-size:16px;cursor:pointer}
+#loginGate .lg-err{color:#ff9c9c;font-size:13px;min-height:18px;margin-top:8px}
+#loginGate .lg-note{font-size:11px;color:#8ea0bd;margin-top:16px;line-height:1.5}
+body.viewonly .owner-only{display:none!important}
+body.viewonly .cacts{display:none!important}
+</style>
+<div id="loginGate">
+  <div class="lg-card">
+    <img src="icon-192.png" alt="">
+    <h1>Sermonário</h1>
+    <p>Pr. Daniel Marcos Ferreira</p>
+    <input id="lgPass" type="password" placeholder="Senha" autocomplete="current-password" enterkeyhint="go">
+    <button id="lgBtn">Entrar</button>
+    <div class="lg-err" id="lgErr"></div>
+    <div class="lg-note">Acesso restrito. A senha geral permite apenas leitura.</div>
+  </div>
+</div>
+<script>
+(function(){
+  var SALT="sermonario::v1::";
+  var OWNER="1cd74fc70365a6b453d30981138ff31cb53a554aeba789cca3fc316dfc1fcd98";
+  var VIEW="7242b23ede69d5420db05728b2fcc0b600238698e21d252d031db1e3a9a1bae1";
+  function applyMode(m){ window.__MODE=m; if(m==='view'){document.body.classList.add('viewonly');} }
+  function hide(){ var g=document.getElementById('loginGate'); if(g) g.style.display='none'; }
+  try{ var saved=localStorage.getItem('sermonario_auth'); if(saved==='owner'||saved==='view'){ applyMode(saved); hide(); } }catch(e){}
+  async function sha(t){ var buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join(''); }
+  async function tryLogin(){
+    var el=document.getElementById('lgPass'), err=document.getElementById('lgErr');
+    try{
+      var h=await sha(SALT+(el.value||''));
+      if(h===OWNER){ try{localStorage.setItem('sermonario_auth','owner');}catch(e){} applyMode('owner'); hide(); }
+      else if(h===VIEW){ try{localStorage.setItem('sermonario_auth','view');}catch(e){} applyMode('view'); hide(); }
+      else { err.textContent='Senha incorreta.'; el.value=''; el.focus(); }
+    }catch(e){ err.textContent='Erro ao validar a senha.'; }
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    var b=document.getElementById('lgBtn'), pw=document.getElementById('lgPass');
+    if(b) b.addEventListener('click',tryLogin);
+    if(pw) pw.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();tryLogin();} });
+    if(pw && !window.__MODE) try{pw.focus();}catch(e){}
+  });
+  window.lockApp=function(){ try{localStorage.removeItem('sermonario_auth');}catch(e){} location.reload(); };
+})();
+</script>
+
 <!-- BANNER DE LEMBRETE -->
-<div id="backupBanner" class="bbk" style="display:none">
+<div id="backupBanner" class="bbk owner-only" style="display:none">
   <span class="bbk-msg"></span>
   <button class="bbk-btn" onclick="doBackup()">↓ Backup agora</button>
   <button class="bbk-x" onclick="document.getElementById('backupBanner').style.display='none'" aria-label="Dispensar">✕</button>
@@ -1228,7 +1282,7 @@ function addCong(){
   renderCongs(); fillCongSelect();
   toast('Congregação adicionada!','ok');
 }
-function delCong(nome){
+function delCong(nome){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   if(!confirm(`Remover "${nome}" da lista de congregações?\n\nOs registros de ministração já feitos nela são preservados.`))return;
   CONGS=CONGS.filter(c=>c!==nome); saveCongs();
   renderCongs(); fillCongSelect();
@@ -1375,7 +1429,7 @@ function load(){
   }
 }
 
-function save(){
+function save(){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   try{
     localStorage.setItem(SK, JSON.stringify(SS));
   }catch(e){
@@ -1680,7 +1734,7 @@ function openView(id){
 }
 
 // ── EDITAR / NOVO ────────────────────────────────────
-function openEdit(id){
+function openEdit(id){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   editId = id || null;
   const s = id ? SS.find(x => x.id === id) : null;
   document.getElementById('mEditTtl').textContent = s ? 'Editar Sermão' : 'Novo Sermão';
@@ -1742,7 +1796,7 @@ async function saveS(){
   render();
 }
 
-function delS(id){
+function delS(id){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const s = SS.find(x => x.id === id);
   const nome = s ? `"${s.title}"` : 'este sermão';
   if(!confirm(`Remover ${nome}?\n\nEsta ação não pode ser desfeita.`)) return;
@@ -1951,7 +2005,7 @@ function applyMetadata(meta, isNew){
 }
 
 // ── IMPORTAR ARQUIVO (.txt, .docx, .rtf) com auto-preenchimento ──
-function importFile(e){
+function importFile(e){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const f = e.target.files[0];
   if(!f) return;
   const ext = f.name.split('.').pop().toLowerCase();
@@ -2121,7 +2175,7 @@ function readSermonText(file){
   });
 }
 
-async function importBatch(e){
+async function importBatch(e){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const files = [...e.target.files];
   e.target.value = '';
   if(!files.length) return;
@@ -2209,7 +2263,7 @@ function addMinToday(){
   renderMinLog();
   toast(cong?`Ministração registrada em ${cong}!`:'Ministração registrada!','ok');
 }
-function removeMinLog(i){
+function removeMinLog(i){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   minLogTemp.splice(i, 1);
   minTemp = Math.max(0, minTemp - 1);
   document.getElementById('mMinN').textContent = minTemp;
@@ -2387,7 +2441,7 @@ async function buildSermaoDOCX(s, iR, iM, iN, dt){
   return await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
 }
 
-function doExp(){
+function doExp(){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const s = SS.find(x => x.id === expId);
   if(!s) return;
   const iR = document.getElementById('eRef').checked;
@@ -2456,7 +2510,7 @@ function openAI(s){
 }
 
 // ── BACKUP ───────────────────────────────────────────
-function doBackup(){
+function doBackup(){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   try{
     const blob = new Blob([JSON.stringify(SS, null, 2)], {type: 'application/json'});
     const a = document.createElement('a');
@@ -2473,7 +2527,7 @@ function doBackup(){
 }
 
 // ── IMPORTAR BACKUP (abre modal de confirmação) ──────
-function openImport(e){
+function openImport(e){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const f = e.target.files[0];
   if(!f) return;
   const r = new FileReader();
@@ -2496,7 +2550,7 @@ function openImport(e){
   e.target.value = '';
 }
 
-function doImport(){
+function doImport(){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   if(!pendingImport) return;
   const mode = document.querySelector('input[name="impMode"]:checked')?.value || 'merge';
   const data = pendingImport.data;
@@ -2851,7 +2905,7 @@ async function loadGoogleLibs(){
   driveLibLoaded = true;
 }
 
-async function driveSignIn(){
+async function driveSignIn(){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const cid = localStorage.getItem(CFG_DRIVE_ID);
   if(!cid){ toast('Configure o Client ID do Google primeiro (⚙)','err'); openSettings(); return false; }
   if(location.protocol === 'file:'){ toast('Sync com nuvem requer hospedagem (não funciona em file://)','err'); return false; }
@@ -3113,7 +3167,7 @@ const scheduleCloudSync = debounce(async () => {
 // ═══════════════════════════════════════════════════════════════
 // ── MENU POPUP DE SYNC ───────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════
-function syncMenu(provider){
+function syncMenu(provider){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const pop = document.getElementById('syncPop');
   const btn = document.getElementById(provider === 'drive' ? 'btnSyncDrive' : 'btnSyncOD');
   const cid = localStorage.getItem(provider === 'drive' ? CFG_DRIVE_ID : CFG_OD_ID);
@@ -3384,7 +3438,7 @@ function csvEscape(v){
   return s;
 }
 
-function exportCSV(){
+function exportCSV(){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const rows = sortListData(getListData());
   if(!rows.length){ toast('Nada para exportar.','err'); return; }
   // Separador ; para compatibilidade com Excel brasileiro
@@ -3415,7 +3469,7 @@ async function loadXLSX(){
   xlsxLoaded = true;
 }
 
-async function exportXLSX(){
+async function exportXLSX(){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const rows = sortListData(getListData());
   if(!rows.length){ toast('Nada para exportar.','err'); return; }
   toast('Carregando biblioteca Excel…');
@@ -4034,7 +4088,7 @@ function completenessScore(s){
 let dupDismissedGroups = new Set();
 let dupLastScan = [];
 
-function dupMergeGroup(groupIndex){
+function dupMergeGroup(groupIndex){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   // Reexecuta varredura para pegar índices atuais (SS pode ter mudado)
   const thresh = parseFloat(document.getElementById('dupThresh').value);
   const groups = findAllDuplicates(thresh);
@@ -4051,7 +4105,7 @@ function dupMergeGroup(groupIndex){
   }
 }
 
-function dupDeleteOne(index, groupIndex){
+function dupDeleteOne(index, groupIndex){ if(window.__MODE==='view'){if(window.toast)toast('Modo leitura — ação não permitida','err');return;}
   const s = SS[index];
   if(!s) return;
   if(!confirm(`Excluir "${s.title}"?\n\nEssa ação não pode ser desfeita (exceto restaurando backup).`)) return;
