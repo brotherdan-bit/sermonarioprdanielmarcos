@@ -2662,7 +2662,7 @@ function showBib(ref, verses, src, warn){
 }
 
 // ── POPUP DE VERSÍCULO NO ESBOÇO ─────────────────────
-const VREGEX=/\b(\d?\s*(?:Gn|Gênesis|Êx|Ex|Êxodo|Lv|Levítico|Nm|Números|Dt|Deuteronômio|Js|Josué|Jz|Juízes|Rt|Rute|1Sm|2Sm|1Rs|2Rs|1Cr|2Cr|Ed|Esdras|Ne|Neemias|Et|Ester|Jó|Sl|Salmo|Salmos|Pv|Provérbios|Ec|Eclesiastes|Ct|Cantares|Is|Isaías|Jr|Jeremias|Lm|Lamentações|Ez|Ezequiel|Dn|Daniel|Os|Oseias|Jl|Joel|Am|Amós|Ob|Obadias|Jn|Jonas|Mq|Miqueias|Na|Naum|Hc|Habacuque|Sf|Sofonias|Ag|Ageu|Zc|Zacarias|Ml|Malaquias|Mt|Mateus|Mc|Marcos|Lc|Lucas|Jo|João|At|Atos|Rm|Romanos|1Co|2Co|Gl|Gálatas|Ef|Efésios|Fp|Filipenses|Cl|Colossenses|1Ts|2Ts|1Tm|2Tm|Tt|Tito|Fm|Filemom|Hb|Hebreus|Tg|Tiago|1Pe|2Pe|1Jo|2Jo|3Jo|Jd|Judas|Ap|Apocalipse))\s+(\d+)(?:[.:](\d+)(?:\s*[-–]\s*(\d+))?)?/g;
+const VREGEX=/\b((?:[123]\s*(?:Samuel|Sm|Reis|Rs|Crônicas|Cronicas|Cr|Coríntios|Corintios|Co|Tessalonicenses|Ts|Timóteo|Timoteo|Tm|Pedro|Pe|João|Jo)|Gênesis|Gn|Êxodo|Êx|Ex|Levítico|Lv|Números|Nm|Deuteronômio|Dt|Josué|Js|Juízes|Jz|Rute|Rt|Esdras|Ed|Neemias|Ne|Ester|Et|Jó|Salmos|Salmo|Sl|Provérbios|Pv|Eclesiastes|Ec|Cantares|Ct|Isaías|Is|Jeremias|Jr|Lamentações|Lm|Ezequiel|Ez|Daniel|Dn|Oseias|Os|Joel|Jl|Amós|Am|Obadias|Ob|Jonas|Jn|Miqueias|Mq|Naum|Na|Habacuque|Hc|Sofonias|Sf|Ageu|Ag|Zacarias|Zc|Malaquias|Ml|Mateus|Mt|Marcos|Mc|Lucas|Lc|João|Jo|Atos|At|Romanos|Rm|Gálatas|Gl|Efésios|Ef|Filipenses|Fp|Colossenses|Cl|Tito|Tt|Filemom|Fm|Hebreus|Hb|Tiago|Tg|Judas|Jd|Apocalipse|Ap)(?![A-Za-zÀ-ÿ]))\s+(\d+)(?:[.:](\d+)(?:\s*[-–]\s*(\d+))?)?/g;
 
 function linkify(text){
   return text.split('\n').map(line => {
